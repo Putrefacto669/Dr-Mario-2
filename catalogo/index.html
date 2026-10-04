@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo | Videojuegos Dr.Mario</title>
+    <meta name="description"
+        content="Catálogo de consolas, juegos, controles y coleccionables con precios en córdobas. Videojuegos Dr.Mario, Niquinohomo, Masaya.">
+    <meta name="theme-color" content="#0B0F19">
+    <link rel="icon" type="image/png" href="../assets/img/favicon-64.png">
+    <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { dark: '#0B0F19', card: '#161F33', red: '#FF2E63', cyan: '#08D9D6', yellow: '#FFDE7D' }
+                    },
+                    fontFamily: {
+                        pixel: ['"Press Start 2P"', 'monospace'],
+                        sans: ['"Space Grotesk"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@0.469.0"></script>
+
+    <style>
+        html { scroll-padding-top: 9rem; }
+        body { background: #0B0F19; }
+        [hidden] { display: none !important; }
+        :focus-visible { outline: 2px solid #08D9D6; outline-offset: 2px; border-radius: 8px; }
+        .bg-grid {
+            background-image: linear-gradient(rgba(8, 217, 214, .06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(8, 217, 214, .06) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .chip[aria-pressed="true"] { background: #08D9D6; color: #0B0F19; border-color: #08D9D6; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { scrollbar-width: none; }
+        .card { transition: transform .25s, border-color .25s, box-shadow .25s; }
+        .card:hover { transform: translateY(-3px); border-color: rgba(8, 217, 214, .45); box-shadow: 0 18px 40px -22px rgba(8, 217, 214, .5); }
+        .skeleton { background: linear-gradient(90deg, #161F33 0%, #1f2a44 50%, #161F33 100%); background-size: 200% 100%; animation: sk 1.2s infinite; }
+        @keyframes sk { to { background-position: -200% 0; } }
+        @media (prefers-reduced-motion: reduce) { .card, .skeleton { transition: none; animation: none; } }
+    </style>
+</head>
+
+<body class="text-slate-100 font-sans antialiased selection:bg-brand-cyan selection:text-slate-900">
+
+    <!-- Aviso de demo: desaparece solo cuando se configura API_URL en assets/js/capas/config.js -->
+    <div id="demo-banner"
+        class="bg-brand-yellow text-slate-900 text-center text-xs sm:text-sm font-semibold px-4 py-2">
+        Demo: productos y precios de ejemplo.
+    </div>
+
+    <!-- ===== Encabezado ===== -->
+    <header class="md:sticky top-0 z-40 bg-brand-dark/95 backdrop-blur border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+            <a href="../" class="flex items-center gap-3 shrink-0" aria-label="Volver al inicio">
+                <img src="../assets/img/logo-128.webp" srcset="../assets/img/logo-128.webp 1x, ../assets/img/logo-256.webp 2x" alt="Videojuegos Dr.Mario" width="48" height="48" class="w-11 h-11 object-contain drop-shadow-[0_0_12px_rgba(255,46,99,0.45)]">
+                <span class="leading-tight">
+                    <span class="font-pixel text-[11px] sm:text-xs text-white block">DR.MARIO</span>
+                    <span class="text-[10px] text-brand-cyan tracking-[0.2em] uppercase font-semibold">Catálogo</span>
+                </span>
+            </a>
+            <div class="flex items-center gap-2">
+                <a href="../"
+                    class="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-slate-300 hover:text-brand-cyan px-3 py-2">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Inicio
+                </a>
+                <a href="https://wa.me/50583807800?text=Hola%20Dr.%20Mario,%20vi%20el%20cat%C3%A1logo%20y%20tengo%20una%20consulta"
+                    target="_blank" rel="noopener"
+                    class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-3.5 py-2 rounded-lg inline-flex items-center gap-2 text-sm">
+                    <i data-lucide="message-circle" class="w-4 h-4"></i><span class="hidden sm:inline">WhatsApp</span>
+                    <span class="sr-only sm:hidden">Escribir por WhatsApp</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="border-t border-slate-800/80">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 space-y-3">
+                <div class="flex gap-2">
+                    <label class="relative flex-1">
+                        <span class="sr-only">Buscar producto</span>
+                        <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        <input id="q" type="search" placeholder="Buscar: Mario, PS2, One Piece…" autocomplete="off"
+                            class="w-full bg-brand-card border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-sm placeholder:text-slate-500 focus:outline-none focus:border-brand-cyan">
+                    </label>
+                    <label class="shrink-0">
+                        <span class="sr-only">Ordenar</span>
+                        <select id="sort"
+                            class="h-full bg-brand-card border border-slate-700 rounded-xl px-3 text-sm focus:outline-none focus:border-brand-cyan">
+                            <option value="destacados">Destacados</option>
+                            <option value="precio-asc">Menor precio</option>
+                            <option value="precio-desc">Mayor precio</option>
+                            <option value="nombre">A – Z</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0" id="category-chips"
+                    role="group" aria-label="Filtrar por tipo de producto"></div>
+                <div class="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0" id="sub-chips"
+                    role="group" aria-label="Filtrar por marca o estilo"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative">
+        <div class="absolute inset-x-0 top-0 h-64 bg-grid pointer-events-none [mask-image:linear-gradient(to_bottom,black,transparent)]" aria-hidden="true"></div>
+
+        <section class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-6">
+                <div class="flex items-center gap-4">
+                    <img src="../assets/img/logo-256.webp" alt="" width="96" height="96" class="hidden sm:block w-24 h-24 object-contain drop-shadow-[0_0_12px_rgba(255,46,99,0.45)]">
+                    <div>
+                    <p class="font-pixel text-[10px] text-brand-red mb-3">SELECT YOUR GAME</p>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white">Catálogo</h1>
+                    <p class="text-sm text-slate-400 mt-2">Precios en córdobas. Consulta disponibilidad por WhatsApp antes de visitarnos.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 text-sm">
+                    <label class="inline-flex items-center gap-2 cursor-pointer select-none text-slate-300">
+                        <input id="only-available" type="checkbox" class="w-4 h-4 accent-[#08D9D6]">
+                        Solo disponibles
+                    </label>
+                    <span id="count" class="text-slate-500" aria-live="polite"></span>
+                </div>
+            </div>
+
+            <div id="grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5"></div>
+
+            <div id="empty" hidden class="text-center py-20">
+                <i data-lucide="ghost" class="w-10 h-10 text-slate-600 mx-auto mb-4"></i>
+                <p class="text-white font-semibold">No encontramos ese producto</p>
+                <p class="text-sm text-slate-400 mt-1 mb-6">Puede que lo tengamos y no esté publicado.</p>
+                <a id="empty-wa" target="_blank" rel="noopener"
+                    class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-5 py-3 rounded-xl text-sm">
+                    <i data-lucide="message-circle" class="w-4 h-4"></i> Preguntar por WhatsApp
+                </a>
+            </div>
+
+            <p id="updated" class="text-xs text-slate-600 text-center mt-12"></p>
+        </section>
+    </main>
+
+    <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500">
+        © <span id="year">2026</span> Videojuegos Dr.Mario — Niquinohomo, Masaya, Nicaragua ·
+        <a href="../" class="text-brand-cyan hover:underline">Volver al inicio</a>
+    </footer>
+
+    <!-- Capas: config → utilidades → modelo → datos → presentación -->
+    <script src="../assets/js/capas/config.js"></script>
+    <script src="../assets/js/capas/utilidades.js"></script>
+    <script src="../assets/js/capas/modelo.js"></script>
+    <script src="../assets/js/capas/datos.js"></script>
+    <script src="catalogo.js"></script>
+</body>
+
+</html>
