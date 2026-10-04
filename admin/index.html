@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario | Videojuegos Dr.Mario</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#0B0F19">
+    <link rel="icon" type="image/png" href="../assets/img/favicon-64.png">
+    <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: { dark: '#0B0F19', card: '#161F33', red: '#FF2E63', cyan: '#08D9D6', yellow: '#FFDE7D' } },
+                    fontFamily: { pixel: ['"Press Start 2P"', 'monospace'], sans: ['"Space Grotesk"', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@0.469.0"></script>
+
+    <style>
+        body { background: #0B0F19; }
+        [hidden] { display: none !important; }
+        :focus-visible { outline: 2px solid #08D9D6; outline-offset: 2px; border-radius: 8px; }
+        .field { width: 100%; background: #0f1626; border: 1px solid #334155; border-radius: .75rem; padding: .7rem .9rem; font-size: .95rem; color: #f1f5f9; }
+        .field:focus { outline: none; border-color: #08D9D6; }
+        .field::placeholder { color: #64748b; }
+        .field.con-icono { padding-left: 2.4rem; }
+        .lbl { display: block; font-size: .8rem; font-weight: 600; color: #cbd5e1; margin-bottom: .4rem; }
+        .opt > span { display: inline-flex; align-items: center; gap: .4rem; padding: .5rem .85rem; border-radius: .75rem; border: 1px solid #334155; background: #0f1626; font-size: .875rem; font-weight: 600; color: #cbd5e1; cursor: pointer; transition: all .15s; }
+        .opt input:checked + span { background: #08D9D6; border-color: #08D9D6; color: #0B0F19; }
+        .opt input:focus-visible + span { outline: 2px solid #08D9D6; outline-offset: 2px; }
+        .seg button[aria-pressed="true"].s-si { background: #10b981; color: #052e1f; }
+        .seg button[aria-pressed="true"].s-pocas { background: #f59e0b; color: #3b2304; }
+        .seg button[aria-pressed="true"].s-agotado { background: #FF2E63; color: #fff; }
+    </style>
+</head>
+
+<body class="text-slate-100 font-sans antialiased min-h-screen">
+
+    <!-- ================= LOGIN ================= -->
+    <section id="login" class="min-h-screen flex items-center justify-center px-4">
+        <form id="login-form" class="w-full max-w-sm bg-brand-card border border-slate-800 rounded-3xl p-8 text-center">
+            <img src="../assets/img/logo-256.webp" srcset="../assets/img/logo-256.webp 1x, ../assets/img/logo-512.webp 2x" alt="Videojuegos Dr.Mario" width="112" height="112" class="w-28 h-28 mx-auto mb-4 object-contain drop-shadow-[0_0_12px_rgba(255,46,99,0.45)]">
+            <p class="font-pixel text-[10px] text-brand-cyan mb-2">DR.MARIO</p>
+            <h1 class="text-2xl font-bold text-white mb-1">Inventario</h1>
+            <p class="text-sm text-slate-400 mb-6">Agrega y actualiza los productos del catálogo.</p>
+            <label class="sr-only" for="pin">PIN</label>
+            <input id="pin" type="password" autocomplete="current-password" placeholder="PIN" required
+                class="field text-center text-lg tracking-[0.4em] mb-3">
+            <p id="login-error" class="text-sm text-brand-red min-h-[1.25rem] mb-2" role="alert"></p>
+            <button id="login-btn" class="w-full bg-brand-cyan hover:bg-cyan-300 text-slate-900 font-bold py-3 rounded-xl transition-colors">Entrar</button>
+            <p id="demo-hint" hidden class="text-xs text-slate-500 mt-5">Demo: el PIN es <b class="text-brand-yellow">1234</b>. Los cambios se guardan solo en este dispositivo.</p>
+            <a href="../catalogo/" class="inline-block text-xs text-slate-500 hover:text-brand-cyan mt-4">Ir al catálogo</a>
+        </form>
+    </section>
+
+    <!-- ================= PANEL ================= -->
+    <section id="app" hidden>
+        <header class="sticky top-0 z-30 bg-brand-dark/95 backdrop-blur border-b border-slate-800">
+            <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <img src="../assets/img/logo-128.webp" srcset="../assets/img/logo-128.webp 1x, ../assets/img/logo-256.webp 2x" alt="Videojuegos Dr.Mario" width="48" height="48" class="w-11 h-11 object-contain drop-shadow-[0_0_12px_rgba(255,46,99,0.45)]">
+                    <div class="leading-tight min-w-0">
+                        <p class="font-pixel text-[10px] text-white">INVENTARIO</p>
+                        <p class="text-xs text-slate-400 truncate">Catálogo Dr.Mario <span id="demo-badge" hidden class="ml-1 text-[10px] font-bold bg-brand-yellow text-slate-900 px-1.5 py-0.5 rounded">DEMO</span></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1">
+                    <a href="../catalogo/" target="_blank" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-300 hover:text-brand-cyan px-3 py-2 rounded-lg">
+                        <i data-lucide="external-link" class="w-4 h-4"></i><span class="hidden sm:inline">Ver catálogo</span>
+                    </a>
+                    <button id="logout" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-300 hover:text-brand-red px-3 py-2 rounded-lg">
+                        <i data-lucide="log-out" class="w-4 h-4"></i><span class="hidden sm:inline">Salir</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-5xl mx-auto px-4 pt-6 pb-28">
+            <div class="grid grid-cols-3 gap-3 mb-6" id="stats"></div>
+
+            <div class="flex flex-col sm:flex-row gap-2 mb-4">
+                <label class="relative flex-1">
+                    <span class="sr-only">Buscar</span>
+                    <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                    <input id="q" type="search" placeholder="Buscar producto…" class="field con-icono">
+                </label>
+                <div class="sm:w-56 shrink-0"><select id="f-cat" class="field" aria-label="Filtrar por tipo"></select></div>
+                <button id="add-btn" class="hidden sm:inline-flex items-center justify-center gap-2 bg-brand-red hover:bg-[#ff4777] text-white font-bold px-5 rounded-xl">
+                    <i data-lucide="plus" class="w-5 h-5"></i> Agregar
+                </button>
+            </div>
+
+            <div id="list" class="space-y-2" aria-live="polite"></div>
+            <p id="list-empty" hidden class="text-center text-slate-500 py-16">No hay productos con ese filtro.</p>
+
+            <p id="demo-reset" hidden class="text-center mt-10">
+                <button class="text-xs text-slate-500 hover:text-brand-yellow underline">Reiniciar productos de la demo</button>
+            </p>
+        </main>
+
+        <!-- Botón flotante (celular) -->
+        <button id="add-fab" aria-label="Agregar producto"
+            class="sm:hidden fixed bottom-5 right-5 z-30 w-16 h-16 rounded-full bg-brand-red text-white shadow-[0_10px_30px_-5px_rgba(255,46,99,.6)] flex items-center justify-center">
+            <i data-lucide="plus" class="w-7 h-7"></i>
+        </button>
+    </section>
+
+    <!-- ================= EDITOR ================= -->
+    <div id="editor" hidden class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm sm:flex sm:items-center sm:justify-center sm:p-6" role="dialog" aria-modal="true" aria-labelledby="editor-title">
+        <form id="form" novalidate class="bg-brand-card sm:border sm:border-slate-700 w-full h-full sm:h-auto sm:max-h-[92vh] sm:max-w-2xl sm:rounded-3xl flex flex-col overflow-hidden">
+            <div class="flex items-center justify-between px-5 h-16 border-b border-slate-800 shrink-0">
+                <h2 id="editor-title" class="text-lg font-bold text-white">Agregar producto</h2>
+                <button type="button" data-close class="w-10 h-10 rounded-full hover:bg-slate-800 flex items-center justify-center" aria-label="Cerrar">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto px-5 py-5 space-y-6">
+                <!-- 1. Tipo -->
+                <fieldset>
+                    <legend class="lbl">¿Qué vas a agregar? *</legend>
+                    <div class="flex flex-wrap gap-2" id="opt-categoria"></div>
+                </fieldset>
+
+                <!-- 2. Nombre -->
+                <div>
+                    <label class="lbl" for="nombre">Nombre del producto *</label>
+                    <input id="nombre" name="nombre" class="field" maxlength="80" placeholder="Ej. PlayStation 2 Slim + 2 controles" required>
+                </div>
+
+                <!-- 3a. Consolas, juegos, accesorios, otros -->
+                <div id="sec-plataforma" class="space-y-4">
+                    <fieldset>
+                        <legend class="lbl">Empresa *</legend>
+                        <div class="flex flex-wrap gap-2" id="opt-empresa"></div>
+                    </fieldset>
+                    <div id="wrap-plataforma-sel">
+                        <label class="lbl" for="plataforma-sel">Consola o plataforma *</label>
+                        <select id="plataforma-sel" class="field"></select>
+                    </div>
+                    <div id="wrap-plataforma-txt" hidden>
+                        <label class="lbl" for="plataforma-txt">Plataforma o marca</label>
+                        <input id="plataforma-txt" class="field" maxlength="40" placeholder="Ej. Atari, PC, Universal">
+                    </div>
+                </div>
+
+                <!-- 3b. Figuras -->
+                <div id="sec-figura" hidden class="space-y-4 rounded-2xl border border-brand-yellow/30 bg-brand-yellow/5 p-4">
+                    <p class="text-xs text-brand-yellow flex items-start gap-2"><i data-lucide="info" class="w-4 h-4 shrink-0 mt-0.5"></i>
+                        Las figuras no van por consola. Se ordenan por estilo y serie para que el cliente las encuentre.</p>
+                    <fieldset>
+                        <legend class="lbl">Estilo *</legend>
+                        <div class="flex flex-wrap gap-2" id="opt-estilo"></div>
+                    </fieldset>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="lbl" for="franquicia">Serie o personaje *</label>
+                            <input id="franquicia" class="field" list="dl-franquicias" maxlength="40" placeholder="Ej. One Piece, Marvel">
+                            <datalist id="dl-franquicias"></datalist>
+                        </div>
+                        <div>
+                            <label class="lbl" for="marca">Fabricante</label>
+                            <input id="marca" class="field" list="dl-fabricantes" maxlength="40" placeholder="Ej. Bandai, Funko">
+                            <datalist id="dl-fabricantes"></datalist>
+                        </div>
+                    </div>
+                    <fieldset>
+                        <legend class="lbl">¿Es original? *</legend>
+                        <div class="flex flex-wrap gap-2" id="opt-autenticidad"></div>
+                        <p class="text-xs text-slate-500 mt-2">Así el cliente sabe exactamente qué está comprando.</p>
+                    </fieldset>
+                    <div class="w-40">
+                        <label class="lbl" for="tamano">Tamaño (cm)</label>
+                        <input id="tamano" type="number" min="1" max="200" inputmode="numeric" class="field" placeholder="Ej. 18">
+                    </div>
+                </div>
+
+                <!-- 4. Precio y estado -->
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="lbl" for="precio">Precio (C$) *</label>
+                        <input id="precio" type="number" min="1" step="1" inputmode="numeric" class="field text-lg font-bold" placeholder="0" required>
+                    </div>
+                    <fieldset>
+                        <legend class="lbl">Estado</legend>
+                        <div class="flex flex-wrap gap-2" id="opt-estado"></div>
+                    </fieldset>
+                </div>
+                <fieldset>
+                    <legend class="lbl">Disponibilidad</legend>
+                    <div class="flex flex-wrap gap-2" id="opt-disponible"></div>
+                </fieldset>
+
+                <!-- 5. Foto -->
+                <div>
+                    <span class="lbl">Foto</span>
+                    <div class="flex items-center gap-4">
+                        <div id="foto-prev" class="w-24 h-24 rounded-2xl bg-[#0f1626] border border-slate-700 overflow-hidden flex items-center justify-center shrink-0">
+                            <i data-lucide="image" class="w-7 h-7 text-slate-600"></i>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label class="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-4 py-2.5 rounded-xl text-sm font-semibold cursor-pointer">
+                                <i data-lucide="camera" class="w-4 h-4"></i> Tomar o elegir foto
+                                <input id="foto" type="file" accept="image/*" class="sr-only">
+                            </label>
+                            <button type="button" id="foto-quitar" hidden class="text-xs text-slate-400 hover:text-brand-red text-left">Quitar foto</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Opciones -->
+                <div class="space-y-3">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input id="destacado" type="checkbox" class="w-5 h-5 accent-[#FFDE7D]">
+                        <span class="text-sm"><b class="text-white">Destacado</b> <span class="text-slate-400">— sale primero con la etiqueta TOP</span></span>
+                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input id="visible" type="checkbox" class="w-5 h-5 accent-[#08D9D6]" checked>
+                        <span class="text-sm"><b class="text-white">Mostrar en el catálogo</b> <span class="text-slate-400">— desmárcalo para ocultarlo sin borrarlo</span></span>
+                    </label>
+                </div>
+
+                <p id="form-error" class="text-sm text-brand-red" role="alert"></p>
+            </div>
+
+            <div class="flex gap-3 px-5 py-4 border-t border-slate-800 shrink-0 bg-brand-card">
+                <button type="button" data-close class="flex-1 sm:flex-none px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 font-semibold">Cancelar</button>
+                <button id="save-btn" class="flex-1 px-5 py-3 rounded-xl bg-brand-cyan hover:bg-cyan-300 text-slate-900 font-bold inline-flex items-center justify-center gap-2">
+                    <i data-lucide="save" class="w-5 h-5"></i><span>Guardar</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Aviso -->
+    <div id="toast" hidden role="status"
+        class="fixed top-20 sm:top-auto sm:bottom-6 left-1/2 -translate-x-1/2 z-[60] max-w-[90vw] text-center bg-white text-slate-900 font-semibold text-sm px-4 py-3 rounded-xl shadow-xl"></div>
+
+    <!-- Capas: config → utilidades → modelo → datos → presentación -->
+    <script src="../assets/js/capas/config.js"></script>
+    <script src="../assets/js/capas/utilidades.js"></script>
+    <script src="../assets/js/capas/modelo.js"></script>
+    <script src="../assets/js/capas/datos.js"></script>
+    <script src="admin.js"></script>
+</body>
+
+</html>
