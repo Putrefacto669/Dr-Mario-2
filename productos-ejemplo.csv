@@ -1,0 +1,8 @@
+id,nombre,categoria,empresa,plataforma,estilo,franquicia,marca,autenticidad,tamano,precio,estado,disponible,imagen,destacado,visible,actualizado
+p001,Nintendo Switch OLED,Consolas,Nintendo,Nintendo Switch,,,,,,12500,Nuevo,si,,Sí,Sí,
+p002,PS Vita 2000 + cargador,Consolas,PlayStation,PS Vita,,,,,,7100,Usado,pocas,,Sí,Sí,
+p003,PlayStation 2 Slim,Consolas,PlayStation,PlayStation 2,,,,,,3900,Usado,si,,No,Sí,
+p004,Mario Kart 8 Deluxe,Juegos,Nintendo,Nintendo Switch,,,,,,1950,Nuevo,si,,Sí,Sí,
+p005,Control DualShock 4,Controles y accesorios,PlayStation,PlayStation 4,,,,,,1300,Usado,agotado,,No,Sí,
+p006,Portgas D. Ace sentado,Figuras,,,Anime y manga,One Piece,Banpresto,Original (licencia oficial),16,1400,Nuevo,si,,Sí,Sí,
+p007,Monkey D. Luffy con tarro,Figuras,,,Anime y manga,One Piece,Genérica,Alternativa / genérica,15,650,Nuevo,pocas,,No,Sí,
