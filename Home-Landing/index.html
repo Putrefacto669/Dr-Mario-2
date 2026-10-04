@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ===================== SEO ===================== -->
+    <title>Videojuegos Dr.Mario | Tu Santuario Gaming Retro en Nicaragua</title>
+    <meta name="description"
+        content="Consolas retro y modernas, coleccionables, servicio técnico especializado y envíos a toda Nicaragua. Visítanos en Niquinohomo, Masaya. Videojuegos Dr.Mario, pasión gamer desde el corazón del país.">
+    <meta name="keywords"
+        content="videojuegos Nicaragua, consolas retro, NES, SNES, Nintendo 64, GameCube, PlayStation, Nintendo Switch, reparación de consolas, servicio técnico, Niquinohomo, Masaya, Dr.Mario">
+    <meta name="author" content="Videojuegos Dr.Mario">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0B0F19">
+    <link rel="canonical" href="https://putrefacto669.github.io/Dr-Mario-Catarina/">
+
+    <!-- ===================== Open Graph / Redes ===================== -->
+    <!-- TODO: cuando publiques el sitio, reemplaza og:url y og:image por URLs absolutas. -->
+    <meta property="og:type" content="business.business">
+    <meta property="og:locale" content="es_NI">
+    <meta property="og:site_name" content="Videojuegos Dr.Mario">
+    <meta property="og:title" content="Videojuegos Dr.Mario | Tu Santuario Gaming en Nicaragua">
+    <meta property="og:description"
+        content="Consolas clásicas, coleccionables, títulos actuales y servicio técnico especializado. Envíos seguros a toda Nicaragua.">
+    <meta property="og:url" content="https://putrefacto669.github.io/Dr-Mario-Catarina/">
+    <meta property="og:image" content="https://putrefacto669.github.io/Dr-Mario-Catarina/assets/img/og-image.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Videojuegos Dr.Mario | Tu Santuario Gaming en Nicaragua">
+    <meta name="twitter:description"
+        content="Consolas clásicas, coleccionables, títulos actuales y servicio técnico especializado. Envíos a toda Nicaragua.">
+    <meta name="twitter:image" content="https://putrefacto669.github.io/Dr-Mario-Catarina/assets/img/og-image.jpg">
+
+    <!-- ===================== Favicon ===================== -->
+    <link rel="icon" type="image/png" href="assets/img/favicon-64.png">
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+
+    <!-- ===================== Fuentes ===================== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- ===================== Tailwind CSS CDN ===================== -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#0B0F19',
+                            card: '#161F33',
+                            red: '#FF2E63',
+                            cyan: '#08D9D6',
+                            yellow: '#FFDE7D'
+                        }
+                    },
+                    fontFamily: {
+                        pixel: ['"Press Start 2P"', 'cursive'],
+                        sans: ['"Space Grotesk"', 'sans-serif']
+                    },
+                    boxShadow: {
+                        glowRed: '0 0 25px rgba(255,46,99,0.35)',
+                        glowCyan: '0 0 25px rgba(8,217,214,0.30)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- ===================== Lucide Icons ===================== -->
+    <script src="https://unpkg.com/lucide@0.469.0"></script>
+
+    <!-- ===================== Three.js (import map) ===================== -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <!-- ===================== Estilos propios ===================== -->
+    <style>
+        :root {
+            color-scheme: dark;
+        }
+
+        html {
+            scroll-padding-top: 6rem;
+        }
+
+        body {
+            background-image:
+                radial-gradient(60rem 40rem at 15% -10%, rgba(255, 46, 99, .10), transparent 60%),
+                radial-gradient(50rem 40rem at 90% 10%, rgba(8, 217, 214, .10), transparent 60%);
+            background-attachment: fixed;
+        }
+
+        /* ---------- Scroll reveal ---------- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity .7s cubic-bezier(.2, .7, .3, 1), transform .7s cubic-bezier(.2, .7, .3, 1);
+            transition-delay: var(--delay, 0ms);
+            will-change: opacity, transform;
+        }
+
+        .reveal.is-visible {
+            opacity: 1;
+            transform: none;
+        }
+
+        /* ---------- Escenario 3D de consolas ---------- */
+        .console-stage {
+            position: relative;
+            height: clamp(12rem, 32vw, 15rem);
+            overflow: hidden;
+            cursor: grab;
+            background:
+                radial-gradient(circle at 50% 118%, rgba(8, 217, 214, .22), transparent 55%),
+                radial-gradient(circle at 50% 20%, rgba(255, 46, 99, .12), transparent 60%),
+                linear-gradient(180deg, #0d1322 0%, #0b0f19 100%);
+        }
+
+        .console-stage:active {
+            cursor: grabbing;
+        }
+
+        .hero-stage {
+            height: clamp(15rem, 44vw, 20rem);
+        }
+
+        @media (min-width: 1024px) {
+            .hero-stage {
+                height: clamp(22rem, 58vh, 30rem);
+            }
+        }
+
+        .console-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .console-fallback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 5rem;
+            height: 5rem;
+            color: #08D9D6;
+            opacity: .14;
+        }
+
+        .console-hint {
+            position: absolute;
+            bottom: .65rem;
+            right: .75rem;
+            font-size: .625rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #94a3b8;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity .3s ease, transform .3s ease;
+            pointer-events: none;
+        }
+
+        .group:hover .console-hint {
+            opacity: 1;
+            transform: none;
+        }
+
+        .console-loading {
+            position: absolute;
+            bottom: .65rem;
+            left: .75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            font-size: .625rem;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: #08D9D6;
+            pointer-events: none;
+            animation: pulseLoad 1.4s ease-in-out infinite;
+        }
+
+        .console-loading::before {
+            content: "";
+            width: .5rem;
+            height: .5rem;
+            border-radius: 9999px;
+            background: #08D9D6;
+            box-shadow: 0 0 10px rgba(8, 217, 214, .8);
+        }
+
+        @keyframes pulseLoad {
+
+            0%,
+            100% {
+                opacity: .45;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* ---------- Galería ---------- */
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+            border: 1px solid #1e293b;
+            display: block;
+            width: 100%;
+            background: #0d1322;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            aspect-ratio: 4 / 3;
+            transition: transform .6s cubic-bezier(.2, .7, .3, 1), filter .4s ease;
+        }
+
+        .gallery-item:hover img,
+        .gallery-item:focus-visible img {
+            transform: scale(1.08);
+        }
+
+        .gallery-cap {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 1.25rem .9rem .75rem;
+            text-align: left;
+            font-size: .75rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            background: linear-gradient(to top, rgba(11, 15, 25, .92), transparent);
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity .35s ease, transform .35s ease;
+        }
+
+        .gallery-item:hover .gallery-cap,
+        .gallery-item:focus-visible .gallery-cap {
+            opacity: 1;
+            transform: none;
+        }
+
+        .gallery-item:focus-visible {
+            outline: 2px solid #08D9D6;
+            outline-offset: 2px;
+        }
+
+        /* ---------- Menú móvil ---------- */
+        #mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .35s ease;
+        }
+
+        #mobile-menu.open {
+            max-height: 24rem;
+        }
+
+        /* ---------- Respeta reduce-motion ---------- */
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            .reveal {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+
+            .console-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-brand-dark text-slate-100 font-sans antialiased selection:bg-brand-cyan selection:text-slate-900">
+
+    <a href="#inicio"
+        class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:bg-brand-cyan focus:text-slate-900 focus:px-4 focus:py-2 focus:rounded-lg focus:font-bold">
+        Saltar al contenido
+    </a>
+
+    <!-- ===================== NAV BAR ===================== -->
+    <header class="fixed top-0 w-full bg-brand-dark/90 backdrop-blur-md z-40 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <a href="#inicio" class="flex items-center gap-3 group" aria-label="Videojuegos Dr.Mario - Inicio">
+                <img src="assets/icono.webp" srcset="assets/icono.webp 1x, assets/icono.webp 2x"
+                    alt="Logo Videojuegos Dr.Mario" width="48" height="48"
+                    class="w-12 h-12 object-contain drop-shadow-[0_0_12px_rgba(255,46,99,0.45)] group-hover:scale-110 transition-transform">
+                <div>
+                    <span class="font-pixel text-sm sm:text-base text-white tracking-wider block">DR.MARIO</span>
+                    <span class="text-xs text-brand-cyan tracking-widest uppercase font-semibold">Videojuegos &
+                        Retro</span>
+                </div>
+            </a>
+
+            <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-300">
+                <a href="#inicio" class="hover:text-brand-cyan transition-colors">Inicio</a>
+                <a href="#consolas" class="hover:text-brand-cyan transition-colors">Consolas</a>
+                <a href="#servicios" class="hover:text-brand-cyan transition-colors">Servicios</a>
+                <a href="#nosotros" class="hover:text-brand-cyan transition-colors">¿Por qué elegirnos?</a>
+                <a href="#galeria" class="hover:text-brand-cyan transition-colors">Galería</a>
+                <a href="catalogo/index.html"
+                    class="text-brand-yellow hover:text-brand-cyan transition-colors">Catálogo</a>
+                <a href="#ubicacion" class="hover:text-brand-cyan transition-colors">Ubicación</a>
+            </nav>
+
+            <div class="flex items-center gap-2">
+                <a href="https://wa.me/50583807800?text=Hola%20Dr.%20Mario,%20quisiera%20consultar%20por%20un%20producto%20o%20servicio"
+                    target="_blank" rel="noopener"
+                    class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:scale-105">
+                    <i data-lucide="message-circle" class="w-5 h-5"></i>
+                    <span class="hidden sm:inline">WhatsApp</span>
+                </a>
+
+                <button id="menu-btn" type="button"
+                    class="md:hidden w-11 h-11 flex items-center justify-center rounded-lg border border-slate-700 text-slate-200 hover:bg-slate-800 transition-colors"
+                    aria-label="Abrir menú de navegación" aria-expanded="false" aria-controls="mobile-menu">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Menú móvil -->
+        <div id="mobile-menu" class="md:hidden border-t border-slate-800 bg-brand-dark/95">
+            <nav class="px-4 py-3 flex flex-col text-sm font-semibold text-slate-300">
+                <a href="#inicio" class="mobile-link py-3 border-b border-slate-800/70 hover:text-brand-cyan">Inicio</a>
+                <a href="#consolas"
+                    class="mobile-link py-3 border-b border-slate-800/70 hover:text-brand-cyan">Consolas</a>
+                <a href="#servicios"
+                    class="mobile-link py-3 border-b border-slate-800/70 hover:text-brand-cyan">Servicios</a>
+                <a href="#nosotros" class="mobile-link py-3 border-b border-slate-800/70 hover:text-brand-cyan">¿Por qué
+                    elegirnos?</a>
+                <a href="#galeria"
+                    class="mobile-link py-3 border-b border-slate-800/70 hover:text-brand-cyan">Galería</a>
+                <a href="catalogo/index.html"
+                    class="py-3 border-b border-slate-800/70 text-brand-yellow hover:text-brand-cyan">Catálogo</a>
+                <a href="#ubicacion" class="mobile-link py-3 hover:text-brand-cyan">Ubicación</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ===================== HERO ===================== -->
+    <section id="inicio" class="pt-32 pb-20 md:pt-40 md:pb-28 relative overflow-hidden">
+        <div
+            class="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-brand-red/10 rounded-full blur-3xl pointer-events-none">
+        </div>
+        <div class="absolute top-1/3 right-10 w-80 h-80 bg-brand-cyan/10 rounded-full blur-3xl pointer-events-none">
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+                <!-- Texto -->
+                <div class="text-center lg:text-left">
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700 text-brand-yellow text-xs font-semibold mb-6 reveal">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        <span>Envíos seguros a toda Nicaragua</span>
+                    </div>
+
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight mb-6 leading-tight reveal"
+                        style="--delay:80ms">
+                        Tu Santuario Gaming <br>
+                        <span
+                            class="bg-gradient-to-r from-brand-cyan via-emerald-400 to-brand-yellow bg-clip-text text-transparent">
+                            Retro &amp; Moderno
+                        </span>
+                    </h1>
+
+                    <p class="max-w-2xl mx-auto lg:mx-0 text-slate-400 text-base sm:text-lg mb-10 leading-relaxed reveal"
+                        style="--delay:160ms">
+                        Consolas clásicas, coleccionables de época, títulos actuales y servicio técnico especializado.
+                        Todo
+                        respaldado por pasión gamer y garantía de calidad.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 reveal"
+                        style="--delay:240ms">
+                        <a href="https://wa.me/50583807800?text=Hola!%20Quisiera%20consultar%20disponibilidad%20de%20consolas%20y%20juegos"
+                            target="_blank" rel="noopener"
+                            class="w-full sm:w-auto bg-brand-red hover:bg-red-600 text-white font-bold px-8 py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-glowRed hover:scale-105">
+                            <i data-lucide="gamepad-2" class="w-5 h-5"></i>
+                            <span>Consultar por WhatsApp</span>
+                        </a>
+                        <a href="#consolas"
+                            class="w-full sm:w-auto bg-brand-card hover:bg-slate-800 text-slate-200 border border-slate-700 font-semibold px-8 py-4 rounded-xl flex items-center justify-center gap-2 transition-all">
+                            <i data-lucide="box" class="w-5 h-5 text-brand-cyan"></i>
+                            <span>Ver consolas en 3D</span>
+                        </a>
+                    </div>
+
+                    <div class="mt-12 pt-8 border-t border-slate-800/80 flex flex-wrap justify-center lg:justify-start items-center gap-6 sm:gap-10 text-slate-500 font-pixel text-xs reveal"
+                        style="--delay:320ms">
+                        <span>NINTENDO SWITCH</span>
+                        <span>GAMECUBE</span>
+                        <span>PLAYSTATION</span>
+                        <span>XBOX</span>
+                        <span>RETRO RETROBIT</span>
+                    </div>
+                </div>
+
+                <!-- Dr. Mario 3D -->
+                <div id="hero-3d" data-model="assets/dr-mario.glb" class="reveal" style="--delay:200ms">
+                    <div class="console-stage hero-stage rounded-3xl border border-slate-800">
+                        <i data-lucide="stethoscope" class="console-fallback"></i>
+                        <canvas class="console-canvas" aria-hidden="true"></canvas>
+                        <span class="console-hint">Arrastrá para girar · 3D</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== CONSOLAS 3D ===================== -->
+    <section id="consolas" class="py-20 bg-brand-card/40 border-y border-slate-800/60 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16 reveal">
+                <h2 class="font-pixel text-xs text-brand-cyan uppercase tracking-widest mb-3">Consolas destacadas</h2>
+                <p class="text-3xl sm:text-4xl font-bold text-white">Nuestra colección en 3D</p>
+                <p class="text-slate-400 mt-4 text-sm sm:text-base">
+                    Pasá el mouse sobre cada consola para girarla y explorarla en tiempo real.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- NES -->
+                <article
+                    class="console-card group bg-brand-card border border-slate-800 rounded-2xl overflow-hidden hover:border-brand-red/50 hover:-translate-y-1 transition-all duration-300 reveal"
+                    data-console="nes" data-accent="#FF2E63" data-model="assets/Models/opt/NES.glb">
+                    <div class="console-stage">
+                        <i data-lucide="gamepad-2" class="console-fallback"></i>
+                        <canvas class="console-canvas" aria-hidden="true"></canvas>
+                        <span class="console-hint">Girar · 3D</span>
+                    </div>
+                    <div class="p-5 border-t border-slate-800">
+                        <p class="text-[11px] font-semibold tracking-widest uppercase text-brand-red mb-1">Nintendo ·
+                            8-bit</p>
+                        <h3 class="text-lg font-bold text-white mb-1">Nintendo Entertainment System</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed">La consola que revivió los videojuegos en
+                            casa. Clásicos eternos y cartuchos de colección.</p>
+                    </div>
+                </article>
+
+                <!-- SNES -->
+                <article
+                    class="console-card group bg-brand-card border border-slate-800 rounded-2xl overflow-hidden hover:border-brand-cyan/50 hover:-translate-y-1 transition-all duration-300 reveal"
+                    data-console="snes" data-accent="#08D9D6" data-model="assets/Models/opt/super_nintendo.glb"
+                    style="--delay:80ms">
+                    <div class="console-stage">
+                        <i data-lucide="gamepad-2" class="console-fallback"></i>
+                        <canvas class="console-canvas" aria-hidden="true"></canvas>
+                        <span class="console-hint">Girar · 3D</span>
+                    </div>
+                    <div class="p-5 border-t border-slate-800">
+                        <p class="text-[11px] font-semibold tracking-widest uppercase text-brand-cyan mb-1">Nintendo ·
+                            16-bit</p>
+                        <h3 class="text-lg font-bold text-white mb-1">Super Nintendo</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed">La era dorada del pixel art y el chip Super
+                            FX.
+                            RPGs y plataformas inolvidables.</p>
+                    </div>
+                </article>
+
+                <!-- N64 (modelo real de Sketchfab) -->
+                <article
+                    class="console-card group bg-brand-card border border-slate-800 rounded-2xl overflow-hidden hover:border-brand-yellow/50 hover:-translate-y-1 transition-all duration-300 reveal"
+                    data-accent="#FFDE7D" style="--delay:160ms">
+                    <div class="console-stage" style="cursor:auto">
+                        <iframe title="Nintendo 64 - modelo 3D interactivo (Sketchfab)"
+                            class="absolute inset-0 w-full h-full border-0" loading="lazy" allowfullscreen
+                            mozallowfullscreen="true" webkitallowfullscreen="true"
+                            allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking
+                            execution-while-out-of-viewport execution-while-not-rendered web-share
+                            src="https://sketchfab.com/models/ca4c866eb4a140e8bcef491e2aa83404/embed?autostart=1&ui_theme=dark&dnt=1">
+                        </iframe>
+                    </div>
+                    <div class="p-5 border-t border-slate-800">
+                        <p class="text-[11px] font-semibold tracking-widest uppercase text-brand-yellow mb-1">Nintendo ·
+                            64-bit</p>
+                        <h3 class="text-lg font-bold text-white mb-1">Nintendo 64</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed">La revolución 3D con 4 puertos de control.
+                            Multijugador en el sofá como pocas veces se vio.</p>
+                    </div>
+                </article>
+
+                <!-- GameCube -->
+                <article
+                    class="console-card group bg-brand-card border border-slate-800 rounded-2xl overflow-hidden hover:border-indigo-400/50 hover:-translate-y-1 transition-all duration-300 reveal"
+                    data-console="gamecube" data-accent="#8b7fd4" data-model="assets/Models/opt/gamecube.glb"
+                    style="--delay:0ms">
+                    <div class="console-stage">
+                        <i data-lucide="gamepad-2" class="console-fallback"></i>
+                        <canvas class="console-canvas" aria-hidden="true"></canvas>
+                        <span class="console-hint">Girar · 3D</span>
+                    </div>
+                    <div class="p-5 border-t border-slate-800">
+                        <p class="text-[11px] font-semibold tracking-widest uppercase text-indigo-300 mb-1">Nintendo ·
+                            Disc</p>
+                        <h3 class="text-lg font-bold text-white mb-1">Nintendo GameCube</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed">Compacta, resistente y llena de joyas
+                            exclusivas. Un cubo con legado gigante.</p>
+                    </div>
+                </article>
+
+                <!-- PlayStation -->
+                <article
+                    class="console-card group bg-brand-card border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-400/50 hover:-translate-y-1 transition-all duration-300 reveal"
+                    data-console="ps1" data-accent="#b9b9c4" data-model="assets/Models/opt/PS1.glb"
+                    style="--delay:80ms">
+                    <div class="console-stage">
+                        <i data-lucide="gamepad-2" class="console-fallback"></i>
+                        <canvas class="console-canvas" aria-hidden="true"></canvas>
+                        <span class="console-hint">Girar · 3D</span>
+                    </div>
+                    <div class="p-5 border-t border-slate-800">
+                        <p class="text-[11px] font-semibold tracking-widest uppercase text-slate-300 mb-1">Sony ·
+                            32-bit</p>
+                        <h3 class="text-lg font-bold text-white mb-1">PlayStation</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed">CD-ROM, cinemáticas y sagas legendarias.
+                            El salto a la era discográfica.</p>
+                    </div>
+                </article>
+
+                <!-- Switch -->
+                <article
+                    class="console-card group bg-brand-card border border-slate-800 rounded-2xl overflow-hidden hover:border-brand-red/50 hover:-translate-y-1 transition-all duration-300 reveal"
+                    data-console="switch" data-accent="#08D9D6" data-model="assets/Models/opt/switch.glb"
+                    style="--delay:160ms">
+                    <div class="console-stage">
+                        <i data-lucide="gamepad-2" class="console-fallback"></i>
+                        <canvas class="console-canvas" aria-hidden="true"></canvas>
+                        <span class="console-hint">Girar · 3D</span>
+                    </div>
+                    <div class="p-5 border-t border-slate-800">
+                        <p class="text-[11px] font-semibold tracking-widest uppercase text-brand-cyan mb-1">Nintendo ·
+                            Híbrida</p>
+                        <h3 class="text-lg font-bold text-white mb-1">Nintendo Switch</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed">Portátil y de sobremesa. La evolución que
+                            rompe la frontera entre casa y calle.</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SERVICIOS ===================== -->
+    <section id="servicios" class="py-20 border-b border-slate-800/60 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16 reveal">
+                <h2 class="font-pixel text-xs text-brand-cyan uppercase tracking-widest mb-3">¿Qué ofrecemos?</h2>
+                <p class="text-3xl sm:text-4xl font-bold text-white">Todo lo que necesitas para tu setup</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div
+                    class="bg-brand-card border border-slate-800 p-8 rounded-2xl hover:border-brand-cyan/50 hover:-translate-y-1 transition-all group reveal">
+                    <div
+                        class="w-14 h-14 bg-brand-cyan/10 rounded-xl flex items-center justify-center text-brand-cyan mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="tv-2" class="w-7 h-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-white">Gaming Retro &amp; Colección</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Consolas icónicas (NES, SNES, N64, GameCube, PS1/PS2), juegos en caja, accesorios originales y
+                        artículos de colección difíciles de conseguir.
+                    </p>
+                </div>
+
+                <div class="bg-brand-card border border-slate-800 p-8 rounded-2xl hover:border-brand-red/50 hover:-translate-y-1 transition-all group reveal"
+                    style="--delay:80ms">
+                    <div
+                        class="w-14 h-14 bg-brand-red/10 rounded-xl flex items-center justify-center text-brand-red mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="wrench" class="w-7 h-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-white">Servicio Técnico Garantizado</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Mantenimiento preventivo, limpieza profunda, cambio de pasta térmica, reparación de controles
+                        (drift) y diagnóstico para consolas de todas las generaciones.
+                    </p>
+                </div>
+
+                <div class="bg-brand-card border border-slate-800 p-8 rounded-2xl hover:border-brand-yellow/50 hover:-translate-y-1 transition-all group reveal"
+                    style="--delay:160ms">
+                    <div
+                        class="w-14 h-14 bg-brand-yellow/10 rounded-xl flex items-center justify-center text-brand-yellow mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="truck" class="w-7 h-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-white">Envíos a Toda Nicaragua</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        ¿Estás fuera de Masaya o Niquinohomo? Enviamos tus productos empacados de forma 100% segura a
+                        cualquier departamento del país.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== POR QUÉ ELEGIRNOS ===================== -->
+    <section id="nosotros" class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="reveal">
+                    <h2 class="font-pixel text-xs text-brand-red uppercase tracking-widest mb-3">La Experiencia Dr.
+                        Mario</h2>
+                    <h3 class="text-3xl sm:text-4xl font-bold mb-6 text-white leading-tight">
+                        Atención personalizada por gamers, para gamers.
+                    </h3>
+                    <p class="text-slate-400 mb-8 leading-relaxed">
+                        Nos apasiona preservar la cultura de los videojuegos. Cada equipo que vendemos o reparamos pasa
+                        por rigurosas pruebas de calidad para asegurar que tengas la mejor experiencia de juego posible.
+                    </p>
+
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3">
+                            <div class="p-1 rounded bg-emerald-500/10 text-emerald-400 mt-1">
+                                <i data-lucide="check" class="w-4 h-4"></i>
+                            </div>
+                            <span class="text-slate-300">Equipos y controles 100% probados antes de la entrega.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="p-1 rounded bg-emerald-500/10 text-emerald-400 mt-1">
+                                <i data-lucide="check" class="w-4 h-4"></i>
+                            </div>
+                            <span class="text-slate-300">Asesoría directa para encontrar exactamente lo que
+                                buscas.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="p-1 rounded bg-emerald-500/10 text-emerald-400 mt-1">
+                                <i data-lucide="check" class="w-4 h-4"></i>
+                            </div>
+                            <span class="text-slate-300">Local físico establecido en Niquinohomo para probar tus
+                                productos.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-brand-card border border-slate-800 p-8 rounded-3xl relative overflow-hidden reveal"
+                    style="--delay:120ms">
+                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-brand-red/10 rounded-full blur-2xl"></div>
+                    <div class="flex items-center gap-1 text-brand-yellow mb-4">
+                        <i data-lucide="star" class="w-6 h-6 fill-brand-yellow"></i>
+                        <i data-lucide="star" class="w-6 h-6 fill-brand-yellow"></i>
+                        <i data-lucide="star" class="w-6 h-6 fill-brand-yellow"></i>
+                        <i data-lucide="star" class="w-6 h-6 fill-brand-yellow"></i>
+                        <i data-lucide="star-half" class="w-6 h-6 fill-brand-yellow"></i>
+                        <span class="ml-2 font-bold text-white text-xl">4.3 / 5</span>
+                    </div>
+                    <blockquote class="text-slate-300 text-lg italic mb-6">
+                        "Excelente lugar para conseguir juegos retro y consolas en muy buen estado. La atención al
+                        cliente es súper buena y los envíos llegan puntuales."
+                    </blockquote>
+                    <div
+                        class="flex items-center justify-between text-xs text-slate-500 border-t border-slate-800 pt-4">
+                        <span class="font-semibold text-slate-400">Reseña destacada en Google Maps</span>
+                        <span>+20 opiniones reales</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== GALERÍA ===================== -->
+    <!-- Fotos reales del local y del dueño (assets/galeria/) -->
+    <section id="galeria" class="py-20 bg-brand-card/40 border-y border-slate-800/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16 reveal">
+                <h2 class="font-pixel text-xs text-brand-cyan uppercase tracking-widest mb-3">Nuestra tienda</h2>
+                <p class="text-3xl sm:text-4xl font-bold text-white">Galería de fotos</p>
+                <p class="text-slate-400 mt-4 text-sm sm:text-base">
+                    Un vistazo real a nuestro local, stock y clientes. Tocá una foto para ampliarla.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                <button class="gallery-item reveal" data-full="assets/galeria/sala.jpg"
+                    aria-label="Ampliar foto del local">
+                    <img src="assets/galeria/sala.jpg" alt="Interior del local de Videojuegos Dr.Mario en Niquinohomo"
+                        loading="lazy" width="2048" height="1152">
+                    <span class="gallery-cap">Nuestro local</span>
+                </button>
+
+                <button class="gallery-item reveal" data-full="assets/galeria/sala2.jpg"
+                    aria-label="Ampliar foto del local" style="--delay:60ms">
+                    <img src="assets/galeria/sala2.jpg" alt="Área de atención y exhibición de consolas" loading="lazy"
+                        width="2048" height="1152">
+                    <span class="gallery-cap">Área de atención</span>
+                </button>
+
+                <button class="gallery-item reveal" data-full="assets/galeria/sala3.jpg"
+                    aria-label="Ampliar foto del local" style="--delay:120ms">
+                    <img src="assets/galeria/sala3.jpg" alt="Estantería con juegos y consolas retro" loading="lazy"
+                        width="2048" height="1152">
+                    <span class="gallery-cap">Stock y estantería</span>
+                </button>
+
+                <button class="gallery-item reveal" data-full="assets/galeria/DrMario.jpg"
+                    aria-label="Ampliar foto del dueño de la tienda" style="--delay:0ms">
+                    <img src="assets/galeria/DrMario.jpg" alt="Dueño de Videojuegos Dr.Mario" loading="lazy"
+                        width="1600" height="2000" style="object-position:center top">
+                    <span class="gallery-cap">El dueño de Dr.Mario</span>
+                </button>
+
+                <button class="gallery-item reveal" data-full="assets/galeria/Ace.jpg"
+                    aria-label="Ampliar foto de la figura de Ace" style="--delay:60ms">
+                    <img src="assets/galeria/Ace.jpg" alt="Figura coleccionable de Ace de One Piece" loading="lazy"
+                        width="2048" height="1536">
+                    <span class="gallery-cap">Figura de Ace · One Piece</span>
+                </button>
+
+                <button class="gallery-item reveal" data-full="assets/galeria/Luffy.jpg"
+                    aria-label="Ampliar foto de la figura de Luffy" style="--delay:120ms">
+                    <img src="assets/galeria/Luffy.jpg" alt="Figura coleccionable de Luffy de One Piece" loading="lazy"
+                        width="2048" height="1536">
+                    <span class="gallery-cap">Figura de Luffy · One Piece</span>
+                </button>
+            </div>
+
+            <div class="text-center mt-10 reveal">
+                <a href="https://maps.app.goo.gl/RQ6SYKeLa8aRRdzx5" target="_blank" rel="noopener"
+                    class="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-brand-cyan font-semibold px-6 py-3 rounded-xl transition-colors text-sm">
+                    <i data-lucide="images" class="w-5 h-5"></i>
+                    <span>Ver más fotos en Google Maps</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== UBICACIÓN & HORARIOS ===================== -->
+    <section id="ubicacion" class="py-20 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16 reveal">
+                <h2 class="font-pixel text-xs text-brand-yellow uppercase tracking-widest mb-3">Visítanos</h2>
+                <p class="text-3xl sm:text-4xl font-bold text-white">Ubicación y Horarios</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="bg-brand-card border border-slate-800 p-8 rounded-2xl flex flex-col justify-between reveal">
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-6">Información de la Tienda</h3>
+
+                        <div class="space-y-6 text-slate-300 text-sm">
+                            <div class="flex items-start gap-4">
+                                <i data-lucide="map-pin" class="w-6 h-6 text-brand-red shrink-0 mt-1"></i>
+                                <div>
+                                    <p class="font-semibold text-white">Dirección:</p>
+                                    <p class="text-slate-400">Del Calvario media cuadra abajo, Calle Real, Niquinohomo,
+                                        Masaya, Nicaragua.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-4">
+                                <i data-lucide="phone" class="w-6 h-6 text-brand-cyan shrink-0 mt-1"></i>
+                                <div>
+                                    <p class="font-semibold text-white">Teléfono / WhatsApp:</p>
+                                    <a href="tel:+50583807800"
+                                        class="text-slate-400 hover:text-brand-cyan transition-colors">+505 8380
+                                        7800</a>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-4">
+                                <i data-lucide="clock" class="w-6 h-6 text-brand-yellow shrink-0 mt-1"></i>
+                                <div>
+                                    <p class="font-semibold text-white">Horario de Atención:</p>
+                                    <p class="text-slate-400">Lun - Sáb: 10:30 AM – 7:00 PM</p>
+                                    <p class="text-slate-400">Domingo: 10:00 AM – 8:00 PM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="https://maps.app.goo.gl/RQ6SYKeLa8aRRdzx5" target="_blank" rel="noopener"
+                        class="mt-8 w-full bg-slate-800 hover:bg-slate-700 text-brand-cyan font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 border border-slate-700 transition-colors text-sm">
+                        <i data-lucide="external-link" class="w-4 h-4"></i>
+                        <span>Abrir en Google Maps</span>
+                    </a>
+                </div>
+
+                <div class="lg:col-span-2 rounded-2xl overflow-hidden border border-slate-800 h-[400px] lg:h-full min-h-[400px] reveal"
+                    style="--delay:120ms">
+                    <iframe title="Mapa de ubicación de Videojuegos Dr.Mario en Niquinohomo, Masaya"
+                        src="https://maps.google.com/maps?q=Videojuegos%20Dr.Mario%2C%20Calle%20Real%2C%20Niquinohomo%2C%20Masaya%2C%20Nicaragua&z=17&hl=es&output=embed"
+                        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        class="w-full h-full grayscale contrast-125 opacity-80 hover:opacity-100 hover:grayscale-0 transition-all duration-500">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="bg-brand-dark border-t border-slate-800 pt-14 pb-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 pb-10 border-b border-slate-800">
+                <div class="lg:col-span-2">
+                    <div class="flex items-center gap-3 mb-4">
+                        <img src="assets/icono.webp" srcset="assets/icono.webp 1x, assets/icono.webp 2x"
+                            alt="Logo Videojuegos Dr.Mario" width="48" height="48"
+                            class="w-12 h-12 object-contain drop-shadow-[0_0_12px_rgba(255,46,99,0.45)]">
+                        <span class="font-pixel text-sm text-white tracking-wider">DR.MARIO</span>
+                    </div>
+                    <p class="text-slate-400 text-sm max-w-md leading-relaxed">
+                        Tu santuario gaming en Nicaragua. Consolas retro y modernas, coleccionables y servicio técnico
+                        especializado con garantía de calidad.
+                    </p>
+                    <a href="https://wa.me/50583807800?text=Hola%20Dr.%20Mario,%20quiero%20hacer%20una%20consulta"
+                        target="_blank" rel="noopener"
+                        class="mt-5 inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-5 py-3 rounded-lg transition-all hover:scale-105">
+                        <i data-lucide="message-circle" class="w-5 h-5"></i>
+                        <span>Escribinos por WhatsApp</span>
+                    </a>
+                </div>
+
+                <div>
+                    <h4 class="font-pixel text-[11px] text-brand-cyan uppercase tracking-widest mb-4">Navegación</h4>
+                    <ul class="space-y-3 text-sm text-slate-400">
+                        <li><a href="#inicio" class="hover:text-brand-cyan transition-colors">Inicio</a></li>
+                        <li><a href="#consolas" class="hover:text-brand-cyan transition-colors">Consolas</a></li>
+                        <li><a href="#servicios" class="hover:text-brand-cyan transition-colors">Servicios</a></li>
+                        <li><a href="#galeria" class="hover:text-brand-cyan transition-colors">Galería</a></li>
+                        <li><a href="catalogo/index.html" class="hover:text-brand-cyan transition-colors">Catálogo</a></li>
+                        <li><a href="#ubicacion" class="hover:text-brand-cyan transition-colors">Ubicación</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-pixel text-[11px] text-brand-yellow uppercase tracking-widest mb-4">Contacto</h4>
+                    <ul class="space-y-3 text-sm text-slate-400">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="map-pin" class="w-4 h-4 text-brand-red shrink-0 mt-0.5"></i>
+                            <span>Niquinohomo, Masaya, Nicaragua</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="phone" class="w-4 h-4 text-brand-cyan shrink-0 mt-0.5"></i>
+                            <a href="tel:+50583807800" class="hover:text-brand-cyan transition-colors">+505 8380
+                                7800</a>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="clock" class="w-4 h-4 text-brand-yellow shrink-0 mt-0.5"></i>
+                            <span>Lun - Sáb: 10:30 AM – 7:00 PM</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-8 text-center text-slate-500 text-xs">
+                <p class="mb-2">© <span id="year">2026</span> Videojuegos Dr.Mario — Niquinohomo, Nicaragua.</p>
+                <p>Pasión por los videojuegos retro y modernos.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===================== BOTÓN FLOTANTE DE WHATSAPP ===================== -->
+    <a href="https://wa.me/50583807800?text=Hola%20Dr.%20Mario,%20me%20gustaría%20hacer%20una%20consulta"
+        target="_blank" rel="noopener" aria-label="Escribir por WhatsApp"
+        class="fixed bottom-6 right-6 z-50 bg-emerald-500 text-slate-950 p-4 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.5)] hover:scale-110 transition-transform flex items-center justify-center">
+        <i data-lucide="message-circle" class="w-7 h-7"></i>
+    </a>
+
+    <!-- ===================== LIGHTBOX GALERÍA ===================== -->
+    <div id="lightbox" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+        role="dialog" aria-modal="true" aria-label="Visor de fotos">
+        <button id="lightbox-close" type="button" aria-label="Cerrar visor"
+            class="absolute top-5 right-5 w-11 h-11 rounded-full bg-slate-800/80 border border-slate-700 text-white flex items-center justify-center hover:bg-slate-700 transition-colors">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+        <figure class="max-w-5xl w-full">
+            <img id="lightbox-img" src="" alt=""
+                class="w-full max-h-[82vh] object-contain rounded-xl border border-slate-800">
+            <figcaption id="lightbox-cap" class="text-center text-slate-400 text-sm mt-4"></figcaption>
+        </figure>
+    </div>
+
+    <!-- Modelos 3D incrustados: permiten ver las consolas abriendo el archivo directamente (file://) -->
+    <script src="assets/modelos-embebidos.js"></script>
+
+    <!-- ===================== Scripts base (no dependen de Three.js) ===================== -->
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Lucide (con protección por si el CDN falla)
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+
+        // Aviso: abrir con file:// impide cargar los modelos 3D (bloqueo de CORS)
+        if (location.protocol === 'file:' && !window.__EMBEDDED_MODELS) {
+            var avisoFile = document.createElement('div');
+            avisoFile.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:100;background:#7f1d1d;color:#fff;font:600 12px/1.5 system-ui,sans-serif;padding:10px 16px;text-align:center';
+            avisoFile.innerHTML = 'Estás abriendo el archivo directamente (file://). Para que carguen los modelos 3D, serví la carpeta con <b>python -m http.server 8000</b> y entrá por <b>http://localhost:8000</b>.';
+            document.body.appendChild(avisoFile);
+        }
+
+        // -------- Menú móvil --------
+        (function () {
+            var btn = document.getElementById('menu-btn');
+            var menu = document.getElementById('mobile-menu');
+            if (!btn || !menu) return;
+
+            function close() {
+                menu.classList.remove('open');
+                btn.setAttribute('aria-expanded', 'false');
+            }
+
+            btn.addEventListener('click', function () {
+                var open = menu.classList.toggle('open');
+                btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            });
+
+            menu.querySelectorAll('a').forEach(function (a) {
+                a.addEventListener('click', close);
+            });
+        })();
+
+        // -------- Scroll reveal --------
+        (function () {
+            var items = document.querySelectorAll('.reveal');
+            if (!('IntersectionObserver' in window)) {
+                items.forEach(function (el) { el.classList.add('is-visible'); });
+                return;
+            }
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('is-visible');
+                        io.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+            items.forEach(function (el) { io.observe(el); });
+        })();
+
+        // -------- Lightbox de la galería --------
+        (function () {
+            var lb = document.getElementById('lightbox');
+            var img = document.getElementById('lightbox-img');
+            var cap = document.getElementById('lightbox-cap');
+            var closeBtn = document.getElementById('lightbox-close');
+            if (!lb || !img) return;
+
+            function open(src, alt, caption) {
+                img.src = src;
+                img.alt = alt || '';
+                cap.textContent = caption || '';
+                lb.classList.remove('hidden');
+                lb.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+                closeBtn.focus();
+            }
+
+            function close() {
+                lb.classList.add('hidden');
+                lb.classList.remove('flex');
+                img.src = '';
+                document.body.style.overflow = '';
+            }
+
+            document.querySelectorAll('.gallery-item').forEach(function (item) {
+                item.addEventListener('click', function () {
+                    var inner = item.querySelector('img');
+                    var full = item.getAttribute('data-full') || (inner ? inner.currentSrc || inner.src : '');
+                    open(full, inner ? inner.alt : '', item.querySelector('.gallery-cap') ? item.querySelector('.gallery-cap').textContent.trim() : '');
+                });
+            });
+
+            closeBtn.addEventListener('click', close);
+            lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
+            document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !lb.classList.contains('hidden')) close(); });
+        })();
+    </script>
+
+    <!-- ===================== Consolas 3D (Three.js, se carga como módulo) ===================== -->
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const isSmallScreen = window.matchMedia('(max-width: 640px)').matches;
+        const preferredDPR = window.devicePixelRatio || 1;
+        const maxDPR = isSmallScreen ? 1.25 : 1.75;
+
+        function hasWebGL() {
+            try {
+                const c = document.createElement('canvas');
+                return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')));
+            } catch (e) {
+                return false;
+            }
+        }
+
+        if (hasWebGL()) {
+
+            // ---------- Helpers ----------
+            const mat = (color, o) => {
+                o = o || {};
+                const m = new THREE.MeshStandardMaterial({
+                    color: color,
+                    roughness: o.rough != null ? o.rough : 0.5,
+                    metalness: o.metal != null ? o.metal : 0.15
+                });
+                if (o.emissive != null) {
+                    m.emissive = new THREE.Color(o.emissive);
+                    m.emissiveIntensity = o.emissiveIntensity != null ? o.emissiveIntensity : 0.6;
+                }
+                return m;
+            };
+            const box = (w, h, d, m) => new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m);
+            const cyl = (rt, rb, h, m, seg) => new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg || 28), m);
+            const put = (parent, mesh, p, r) => {
+                p = p || [0, 0, 0];
+                r = r || [0, 0, 0];
+                mesh.position.set(p[0], p[1], p[2]);
+                mesh.rotation.set(r[0], r[1], r[2]);
+                parent.add(mesh);
+                return mesh;
+            };
+            const flat = [Math.PI / 2, 0, 0]; // cilindro mirando hacia +Z
+
+            // ---------- Construcción de cada consola ----------
+            function buildNES() {
+                const g = new THREE.Group();
+                const shell = mat(0xd9d9d1, { rough: .55 });
+                const top = mat(0xc4c4ba, { rough: .55 });
+                const dark = mat(0x2a2b30, { rough: .6 });
+                const red = mat(0xb0281f, { rough: .45 });
+
+                put(g, box(3.0, .6, 2.1, shell));
+                put(g, box(2.35, .34, 1.6, top), [0, .47, -.05]);
+                put(g, box(1.7, .12, .52, dark), [0, .68, -.25]);
+                put(g, box(3.02, .18, .16, dark), [0, .05, 1.02]);
+                put(g, box(.26, .12, .1, red), [-1.2, .06, 1.08]);      // power
+                put(g, box(.26, .12, .1, top), [-.75, .06, 1.08]);      // reset
+                put(g, cyl(.11, .11, .14, dark), [-.35, .05, 1.04], flat); // puerto 1
+                put(g, cyl(.11, .11, .14, dark), [.1, .05, 1.04], flat);   // puerto 2
+
+                const cart = new THREE.Group();
+                put(cart, box(.95, 1.0, .16, mat(0x9a9a94, { rough: .6 })));
+                put(cart, box(.7, .6, .03, red), [0, .06, .09]);
+                put(cart, box(.7, .1, .03, mat(0xe8e8e0)), [0, -.3, .09]);
+                put(g, cart, [0, 1.12, -.25], [-.16, 0, 0]);
+                return g;
+            }
+
+            function buildSNES() {
+                const g = new THREE.Group();
+                const shell = mat(0xbfbfb5, { rough: .55 });
+                const top = mat(0xcdcdc3, { rough: .5 });
+                const purple = mat(0x6f5aa8, { rough: .45 });
+                const dark = mat(0x2b2b30, { rough: .6 });
+
+                put(g, box(3.1, .55, 2.0, shell));
+                put(g, box(2.6, .3, 1.75, top), [0, .42, -.02]);
+                put(g, box(2.75, .12, 1.8, purple), [0, .6, -.02]);
+                put(g, box(3.12, .2, .14, dark), [0, .06, .96]);
+                put(g, box(.5, .14, .2, purple), [1.0, .6, .02]);   // eject
+                put(g, box(.7, .16, .24, dark), [-1.0, .6, .02]);    // power switch
+                put(g, cyl(.13, .13, .14, purple), [-1.1, .06, .99], flat);
+                put(g, cyl(.13, .13, .14, purple), [-.7, .06, .99], flat);
+
+                const cart = new THREE.Group();
+                put(cart, box(1.0, .95, .18, mat(0x8f8f88, { rough: .6 })));
+                put(cart, box(.75, .58, .03, purple), [0, .05, .1]);
+                put(g, cart, [0, .95, .15], [-.12, 0, 0]);
+                return g;
+            }
+
+            function buildN64() {
+                const g = new THREE.Group();
+                const shell = mat(0x33333b, { rough: .5 });
+                const shell2 = mat(0x43434e, { rough: .5 });
+                const dark = mat(0x1c1c22, { rough: .6 });
+
+                put(g, box(2.9, .7, 2.2, shell));
+                put(g, box(1.6, .55, 1.1, shell2), [0, .55, -.35]);
+                put(g, box(1.15, .95, .6, mat(0x4a4a57, { rough: .55 })), [0, 1.05, -.35]);
+                put(g, box(.8, .5, .03, mat(0x2f6fb0)), [0, 1.13, -.04]);
+                for (let i = 0; i < 4; i++) {
+                    put(g, cyl(.11, .11, .16, dark), [-.9 + i * .6, 0, 1.06], flat);
+                }
+                put(g, box(.22, .12, .2, mat(0x3a3a44)), [-1.05, .36, .75]);
+                return g;
+            }
+
+            function buildGameCube() {
+                const g = new THREE.Group();
+                const indigo = mat(0x4b3a8f, { rough: .4, metal: .1 });
+                const dark = mat(0x271f4a, { rough: .5 });
+                const gray = mat(0x9a9aa6, { rough: .4 });
+
+                put(g, box(2.3, 1.5, 2.3, indigo));
+                put(g, cyl(.92, .95, .1, dark), [0, .79, -.1]);
+                put(g, cyl(.78, .78, .06, indigo), [0, .85, -.1]);
+                put(g, box(.16, .06, .55, gray), [.55, .85, -.1]);
+                put(g, box(.4, .22, .06, dark), [-.75, .45, 1.16]);
+                put(g, box(.4, .22, .06, dark), [-.25, .45, 1.16]);
+                put(g, box(.9, .3, .05, mat(0x1b1b22)), [.55, .4, 1.16]);
+                for (let i = 0; i < 4; i++) {
+                    put(g, cyl(.1, .1, .1, gray), [-.9 + i * .6, -.35, 1.16], flat);
+                }
+                return g;
+            }
+
+            function buildPS1() {
+                const g = new THREE.Group();
+                const shell = mat(0xb7b7bd, { rough: .5 });
+                const top = mat(0xc6c6cc, { rough: .45 });
+                const dark = mat(0x2b2b30, { rough: .6 });
+                const gray = mat(0x9a9aa6, { rough: .5 });
+
+                put(g, box(2.9, .45, 2.0, shell));
+                put(g, box(2.9, .12, 2.0, top), [0, .28, 0]);
+                put(g, cyl(.85, .9, .08, gray), [.35, .36, .05]);
+                put(g, cyl(.55, .55, .05, mat(0xa9a9b0)), [.35, .4, .05]);
+                put(g, box(.5, .06, .1, dark), [-.35, .38, .05]);
+                put(g, cyl(.14, .14, .1, dark), [-1.15, .36, -.6]);
+                put(g, cyl(.14, .14, .1, dark), [-1.15, .36, -.2]);
+                put(g, cyl(.14, .14, .1, dark), [1.15, .36, -.6]);
+                put(g, box(.6, .18, .05, dark), [-.7, .05, 1.01]);
+                put(g, box(.6, .18, .05, dark), [.7, .05, 1.01]);
+                return g;
+            }
+
+            function buildSwitch() {
+                const g = new THREE.Group();
+                const body = mat(0x22222a, { rough: .5 });
+                const screen = mat(0x0b3b5a, { rough: .25, metal: .1, emissive: 0x0a4a72, emissiveIntensity: .7 });
+                const red = mat(0xd91f2b, { rough: .45 });
+                const blue = mat(0x0f9bd7, { rough: .45 });
+                const dark = mat(0x15151a, { rough: .5 });
+
+                put(g, box(2.0, 1.4, .12, body));
+                put(g, box(1.72, 1.14, .03, screen), [0, 0, .07]);
+                put(g, box(.3, 1.4, .16, red), [-1.14, 0, 0]);
+                put(g, box(.3, 1.4, .16, blue), [1.14, 0, 0]);
+                put(g, cyl(.1, .1, .06, dark), [-1.14, .42, .1], flat);
+                put(g, cyl(.1, .1, .06, dark), [1.14, -.42, .1], flat);
+                return g;
+            }
+
+            const BUILDERS = {
+                nes: buildNES,
+                snes: buildSNES,
+                n64: buildN64,
+                gamecube: buildGameCube,
+                ps1: buildPS1,
+                switch: buildSwitch
+            };
+
+            // Normaliza el tamaño y centra el modelo en el origen
+            function normalize(group, target) {
+                const bb = new THREE.Box3().setFromObject(group);
+                const size = new THREE.Vector3();
+                const center = new THREE.Vector3();
+                bb.getSize(size);
+                bb.getCenter(center);
+                group.position.sub(center);
+                const wrap = new THREE.Group();
+                wrap.add(group);
+                const maxDim = Math.max(size.x, size.y, size.z) || 1;
+                wrap.scale.setScalar(target / maxDim);
+                return wrap;
+            }
+
+            function buildConsole(type) {
+                const fn = BUILDERS[type] || buildNES;
+                return normalize(fn(), 3.0);
+            }
+
+            // ---------- Carga de modelos reales (.glb) ----------
+            const gltfLoader = new GLTFLoader();
+
+            // Cola con concurrencia limitada: no saturar la red pidiendo todo a la vez
+            const loadQueue = [];
+            let activeLoads = 0;
+            const MAX_CONCURRENT = 2;
+            function enqueueLoad(start) {
+                loadQueue.push(start);
+                pumpQueue();
+            }
+            function pumpQueue() {
+                while (activeLoads < MAX_CONCURRENT && loadQueue.length) {
+                    const start = loadQueue.shift();
+                    activeLoads++;
+                    start(function () {
+                        activeLoads--;
+                        pumpQueue();
+                    });
+                }
+            }
+
+            // Centra y escala cualquier modelo al tamaño objetivo
+            function fitObject(object, target) {
+                const bb = new THREE.Box3().setFromObject(object);
+                const size = new THREE.Vector3();
+                const center = new THREE.Vector3();
+                bb.getSize(size);
+                bb.getCenter(center);
+                object.position.sub(center);
+                const wrap = new THREE.Group();
+                wrap.add(object);
+                const maxDim = Math.max(size.x, size.y, size.z) || 1;
+                wrap.scale.setScalar(target / maxDim);
+                return wrap;
+            }
+
+            function disposeModel(object) {
+                object.traverse(function (o) {
+                    if (o.geometry) o.geometry.dispose();
+                    if (o.material) {
+                        const mats = Array.isArray(o.material) ? o.material : [o.material];
+                        mats.forEach(function (m) {
+                            for (const key in m) {
+                                const val = m[key];
+                                if (val && val.isTexture) val.dispose();
+                            }
+                            m.dispose();
+                        });
+                    }
+                });
+            }
+
+            // ---------- Visor 3D por tarjeta ----------
+            const viewers = [];
+
+            function createViewer(card) {
+                const stage = card.querySelector('.console-stage');
+                const canvas = card.querySelector('canvas');
+                if (!stage || !canvas) return;
+
+                const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: !isSmallScreen, alpha: true, powerPreference: 'high-performance' });
+                renderer.setPixelRatio(Math.min(preferredDPR, maxDPR));
+                renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+                camera.position.set(0, 2.1, 6.6);
+                camera.lookAt(0, 0.05, 0);
+
+                scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+                const key = new THREE.DirectionalLight(0xffffff, 1.5);
+                key.position.set(4, 6, 5);
+                scene.add(key);
+
+                const rim = new THREE.DirectionalLight(0x08d9d6, 0.9);
+                rim.position.set(-6, 2, -4);
+                scene.add(rim);
+
+                const fill = new THREE.DirectionalLight(0xff2e63, 0.6);
+                fill.position.set(-3, -3, 5);
+                scene.add(fill);
+
+                // Entorno PBR perezoso: se genera recién cuando llega el modelo real
+                let envReady = false;
+                function ensureEnvironment() {
+                    if (envReady) return;
+                    envReady = true;
+                    const pmrem = new THREE.PMREMGenerator(renderer);
+                    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+                    pmrem.dispose();
+                }
+
+                const consoleType = card.getAttribute('data-console');
+                const model = consoleType ? buildConsole(consoleType) : new THREE.Group();
+                model.rotation.set(-0.08, 0.6, 0);
+                scene.add(model);
+
+                const v = {
+                    renderer: renderer,
+                    scene: scene,
+                    camera: camera,
+                    model: model,
+                    stage: stage,
+                    hover: false,
+                    visible: false,
+                    phase: Math.random() * Math.PI * 2,
+                    target: { x: -0.08, y: 0.6 },
+                    autoSpeed: 0.32,
+                    done: false,
+                    loadedReal: false
+                };
+
+                function resize() {
+                    const w = stage.clientWidth || 1;
+                    const h = stage.clientHeight || 1;
+                    renderer.setSize(w, h, false);
+                    camera.aspect = w / h;
+                    camera.updateProjectionMatrix();
+                }
+                resize();
+                v.resize = resize;
+
+                if ('ResizeObserver' in window) {
+                    const ro = new ResizeObserver(resize);
+                    ro.observe(stage);
+                }
+
+                // Interacción con el puntero (mouse + touch)
+                function pointAt(e) {
+                    const r = stage.getBoundingClientRect();
+                    const nx = (e.clientX - r.left) / r.width - 0.5;
+                    const ny = (e.clientY - r.top) / r.height - 0.5;
+                    v.hover = true;
+                    v.target.y = -0.4 + nx * 2.2;
+                    v.target.x = -0.1 + ny * 1.0;
+                }
+                stage.addEventListener('pointermove', pointAt);
+                stage.addEventListener('pointerdown', pointAt);
+                stage.addEventListener('pointerup', function () { v.hover = false; });
+                stage.addEventListener('pointercancel', function () { v.hover = false; });
+                stage.addEventListener('pointerleave', function () { v.hover = false; });
+
+                // Solo se anima/renderiza cuando está en pantalla
+                if ('IntersectionObserver' in window) {
+                    const vio = new IntersectionObserver(function (entries) {
+                        entries.forEach(function (en) { v.visible = en.isIntersecting; });
+                    }, { threshold: 0.05 });
+                    vio.observe(card);
+                } else {
+                    v.visible = true;
+                }
+
+                // Carga del modelo real (.glb); el procedural queda como respaldo
+                const modelPath = card.getAttribute('data-model');
+                const modelSource = (window.__EMBEDDED_MODELS && window.__EMBEDDED_MODELS[modelPath]) || modelPath;
+                if (modelPath) {
+                    const badge = document.createElement('span');
+                    badge.className = 'console-loading';
+                    badge.textContent = 'Cargando modelo';
+                    stage.appendChild(badge);
+
+                    enqueueLoad(function (complete) {
+                        gltfLoader.load(modelSource, function (gltf) {
+                            ensureEnvironment();
+                            const real = fitObject(gltf.scene, 3.0);
+                            real.rotation.copy(v.model.rotation);
+                            real.position.copy(v.model.position);
+                            scene.remove(v.model);
+                            disposeModel(v.model);
+                            scene.add(real);
+                            v.model = real;
+                            v.done = false;
+                            v.loadedReal = true;
+                            badge.remove();
+                            complete();
+                        }, function (evt) {
+                            if (evt && evt.total) {
+                                badge.textContent = 'Cargando ' + Math.round((evt.loaded / evt.total) * 100) + '%';
+                            }
+                        }, function (err) {
+                            console.warn('No se pudo cargar el modelo', modelPath, err);
+                            badge.textContent = 'Modelo no disponible';
+                            setTimeout(function () { badge.remove(); }, 4000);
+                            complete();
+                        });
+                    });
+                }
+
+                resize();
+                renderer.render(scene, camera);
+
+                viewers.push(v);
+                return v;
+            }
+
+            // ---------- Loop global ----------
+            let last = performance.now();
+            function tick(now) {
+                const dt = Math.min((now - last) / 1000, 0.05);
+                last = now;
+
+                if (!document.hidden) {
+                    for (let i = 0; i < viewers.length; i++) {
+                        const v = viewers[i];
+                        if (!v.visible) continue;
+
+                        if (reducedMotion) {
+                            if (!v.done) { v.renderer.render(v.scene, v.camera); v.done = true; }
+                            continue;
+                        }
+
+                        if (v.hover) {
+                            const k = Math.min(1, dt * 7);
+                            v.model.rotation.y += (v.target.y - v.model.rotation.y) * k;
+                            v.model.rotation.x += (v.target.x - v.model.rotation.x) * k;
+                        } else {
+                            v.model.rotation.y += v.autoSpeed * dt;
+                            v.model.rotation.x += (-0.08 - v.model.rotation.x) * Math.min(1, dt * 3);
+                        }
+
+                        v.model.position.y = Math.sin(now * 0.0015 + v.phase) * 0.07;
+                        v.renderer.render(v.scene, v.camera);
+                    }
+                }
+                requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+
+            // Redimensionado general
+            let rt;
+            window.addEventListener('resize', function () {
+                clearTimeout(rt);
+                rt = setTimeout(function () {
+                    viewers.forEach(function (v) { if (v.resize) v.resize(); });
+                }, 150);
+            });
+
+            // Inicializa cada tarjeta cuando entra en pantalla
+            const cards = document.querySelectorAll('[data-console]');
+            const lazy = 'IntersectionObserver' in window
+                ? new IntersectionObserver(function (entries) {
+                    entries.forEach(function (e) {
+                        if (e.isIntersecting) {
+                            createViewer(e.target);
+                            lazy.unobserve(e.target);
+                        }
+                    });
+                }, { rootMargin: '250px' })
+                : null;
+
+            cards.forEach(function (card) {
+                if (lazy) lazy.observe(card);
+                else createViewer(card);
+            });
+
+            // Dr. Mario del hero (se carga de inmediato)
+            const heroViewer = document.getElementById('hero-3d');
+            if (heroViewer) createViewer(heroViewer);
+        } else {
+            document.querySelectorAll('.console-stage').forEach(function (s) {
+                var t = document.createElement('span');
+                t.className = 'console-loading';
+                t.style.animation = 'none';
+                t.textContent = '3D no soportado en este navegador';
+                s.appendChild(t);
+            });
+        }
+    </script>
+</body>
+
+</html>
