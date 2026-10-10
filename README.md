@@ -124,3 +124,19 @@ Se cargan en ese orden (config → utilidades → modelo → datos → presentac
 ## Logo
 
 `assets/img/` tiene el logo en tamaños livianos (`logo-128/256/512.webp`), el favicon, el ícono para iPhone y la imagen para compartir (`og-image.jpg`). `assets/icono.webp` es el original (1345 px).
+
+## Dashboard del inventario
+
+Al entrar a `admin/` el Doc ve primero el **Dashboard** y luego la pestaña **Inventario**.
+
+| Parte | Qué muestra |
+| --- | --- |
+| Tarjetas | Productos publicados, disponibles, agotados y **valor del inventario** (precio × unidades) |
+| Clics en "Lo quiero" | Gráfica por día con filtro de 7, 30 o 90 días |
+| Lo más pedido | Top de productos con más clics |
+| Stock por tipo | Disponible, pocas unidades y agotado por tipo de producto |
+| Reponer pronto | Agotados o con pocas unidades, ordenados por lo que más piden |
+| Descargar reporte | CSV que abre en Excel con todo el inventario y los clics del periodo |
+
+Archivos: `assets/js/capas/reportes.js` (cálculos, capa de modelo), `admin/dashboard.js` (gráficas, presentación). Las gráficas son SVG propio, sin librerías.
+En modo demo los clics son de ejemplo; los que se hagan en el catálogo desde el mismo dispositivo también se suman.

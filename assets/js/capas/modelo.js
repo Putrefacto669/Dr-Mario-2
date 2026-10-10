@@ -70,6 +70,8 @@ window.DrMario = window.DrMario || {};
       precio: Number(String(p.precio ?? '').replace(/[^\d.]/g, '')) || 0,
       estado: ESTADOS.includes(p.estado) ? p.estado : '',
       disponible: dispNorm(p.disponible),
+      cantidad: p.cantidad === '' || p.cantidad === null || p.cantidad === undefined || isNaN(Number(p.cantidad))
+        ? null : Math.max(0, Math.round(Number(p.cantidad))),
       imagen: String(p.imagen || '').trim(),
       destacado: bool(p.destacado),
       visible: p.visible === undefined || p.visible === '' ? true : bool(p.visible),
@@ -88,7 +90,17 @@ window.DrMario = window.DrMario || {};
     if (esFigura && !String(p.franquicia || '').trim()) faltas.push('la serie o personaje');
     if (esFigura && !p.autenticidad) faltas.push('si la figura es original');
     if (!(Number(p.precio) > 0)) faltas.push('el precio');
+    if (p.cantidad !== null && p.cantidad !== undefined && p.cantidad !== '' && !(Number(p.cantidad) >= 0)) faltas.push('unidades válidas');
     return faltas;
+  }
+
+  // Disponibilidad sugerida según las unidades en stock
+  function dispPorCantidad(n) {
+    if (n === null || n === undefined || n === '') return null;
+    n = Number(n);
+    if (n <= 0) return 'agotado';
+    if (n <= 2) return 'pocas';
+    return 'si';
   }
 
   // ¿En qué filtro de marca cae? (Retro se calcula por plataforma)
@@ -114,28 +126,28 @@ window.DrMario = window.DrMario || {};
 
   // Productos de ejemplo para el modo demo
   const DEMO = [
-    { nombre: 'Nintendo Switch OLED', categoria: 'Consolas', empresa: 'Nintendo', plataforma: 'Nintendo Switch', precio: 12500, estado: 'Nuevo', disponible: 'si', destacado: true },
-    { nombre: 'PS Vita 2000 + cargador', categoria: 'Consolas', empresa: 'PlayStation', plataforma: 'PS Vita', precio: 7100, estado: 'Usado', disponible: 'pocas', destacado: true },
-    { nombre: 'PlayStation 2 Slim', categoria: 'Consolas', empresa: 'PlayStation', plataforma: 'PlayStation 2', precio: 3900, estado: 'Usado', disponible: 'si', destacado: true },
-    { nombre: 'Nintendo 64 + control', categoria: 'Consolas', empresa: 'Nintendo', plataforma: 'Nintendo 64', precio: 5200, estado: 'Usado', disponible: 'pocas' },
-    { nombre: 'Xbox 360 Slim 250GB', categoria: 'Consolas', empresa: 'Xbox', plataforma: 'Xbox 360', precio: 4200, estado: 'Usado', disponible: 'si' },
-    { nombre: 'Sega Genesis + 2 controles', categoria: 'Consolas', empresa: 'Sega', plataforma: 'Genesis / Mega Drive', precio: 3600, estado: 'Usado', disponible: 'agotado' },
-    { nombre: 'Mario Kart 8 Deluxe', categoria: 'Juegos', empresa: 'Nintendo', plataforma: 'Nintendo Switch', precio: 1950, estado: 'Nuevo', disponible: 'si', destacado: true },
-    { nombre: 'God of War Ragnarök', categoria: 'Juegos', empresa: 'PlayStation', plataforma: 'PlayStation 5', precio: 1800, estado: 'Usado', disponible: 'si' },
-    { nombre: 'Super Mario 64', categoria: 'Juegos', empresa: 'Nintendo', plataforma: 'Nintendo 64', precio: 1500, estado: 'Usado', disponible: 'si' },
-    { nombre: 'Persona 4 Golden', categoria: 'Juegos', empresa: 'PlayStation', plataforma: 'PS Vita', precio: 900, estado: 'Usado', disponible: 'si' },
-    { nombre: 'Control DualShock 4', categoria: 'Controles y accesorios', empresa: 'PlayStation', plataforma: 'PlayStation 4', precio: 1300, estado: 'Usado', disponible: 'si' },
-    { nombre: 'Joy-Con (par)', categoria: 'Controles y accesorios', empresa: 'Nintendo', plataforma: 'Nintendo Switch', precio: 2100, estado: 'Nuevo', disponible: 'si' },
-    { nombre: 'Cable HDMI 2 m', categoria: 'Controles y accesorios', empresa: 'Otra', plataforma: 'Universal', precio: 250, estado: 'Nuevo', disponible: 'si' },
-    { nombre: 'Portgas D. Ace sentado', categoria: 'Figuras', estilo: 'Anime y manga', franquicia: 'One Piece', marca: 'Banpresto', autenticidad: 'Original (licencia oficial)', tamano: '16', precio: 1400, estado: 'Nuevo', disponible: 'si', destacado: true },
-    { nombre: 'Monkey D. Luffy con tarro', categoria: 'Figuras', estilo: 'Anime y manga', franquicia: 'One Piece', marca: 'Genérica', autenticidad: 'Alternativa / genérica', tamano: '15', precio: 650, estado: 'Nuevo', disponible: 'pocas' },
-    { nombre: 'Goku Super Saiyajin', categoria: 'Figuras', estilo: 'Anime y manga', franquicia: 'Dragon Ball', marca: 'Bandai', autenticidad: 'Original (licencia oficial)', tamano: '22', precio: 1900, estado: 'Nuevo', disponible: 'si' },
-    { nombre: 'Funko Pop! Mario', categoria: 'Figuras', estilo: 'Videojuegos', franquicia: 'Super Mario', marca: 'Funko', autenticidad: 'Original (licencia oficial)', tamano: '10', precio: 850, estado: 'Nuevo', disponible: 'si' },
-    { nombre: 'Spider-Man articulado', categoria: 'Figuras', estilo: 'Cómics y superhéroes', franquicia: 'Marvel', marca: 'Hasbro', autenticidad: 'Original (licencia oficial)', tamano: '15', precio: 1250, estado: 'Nuevo', disponible: 'agotado' },
+    { nombre: 'Nintendo Switch OLED', cantidad: 4, categoria: 'Consolas', empresa: 'Nintendo', plataforma: 'Nintendo Switch', precio: 12500, estado: 'Nuevo', disponible: 'si', destacado: true },
+    { nombre: 'PS Vita 2000 + cargador', cantidad: 1, categoria: 'Consolas', empresa: 'PlayStation', plataforma: 'PS Vita', precio: 7100, estado: 'Usado', disponible: 'pocas', destacado: true },
+    { nombre: 'PlayStation 2 Slim', cantidad: 3, categoria: 'Consolas', empresa: 'PlayStation', plataforma: 'PlayStation 2', precio: 3900, estado: 'Usado', disponible: 'si', destacado: true },
+    { nombre: 'Nintendo 64 + control', cantidad: 2, categoria: 'Consolas', empresa: 'Nintendo', plataforma: 'Nintendo 64', precio: 5200, estado: 'Usado', disponible: 'pocas' },
+    { nombre: 'Xbox 360 Slim 250GB', cantidad: 3, categoria: 'Consolas', empresa: 'Xbox', plataforma: 'Xbox 360', precio: 4200, estado: 'Usado', disponible: 'si' },
+    { nombre: 'Sega Genesis + 2 controles', cantidad: 0, categoria: 'Consolas', empresa: 'Sega', plataforma: 'Genesis / Mega Drive', precio: 3600, estado: 'Usado', disponible: 'agotado' },
+    { nombre: 'Mario Kart 8 Deluxe', cantidad: 6, categoria: 'Juegos', empresa: 'Nintendo', plataforma: 'Nintendo Switch', precio: 1950, estado: 'Nuevo', disponible: 'si', destacado: true },
+    { nombre: 'God of War Ragnarök', cantidad: 3, categoria: 'Juegos', empresa: 'PlayStation', plataforma: 'PlayStation 5', precio: 1800, estado: 'Usado', disponible: 'si' },
+    { nombre: 'Super Mario 64', cantidad: 4, categoria: 'Juegos', empresa: 'Nintendo', plataforma: 'Nintendo 64', precio: 1500, estado: 'Usado', disponible: 'si' },
+    { nombre: 'Persona 4 Golden', cantidad: 5, categoria: 'Juegos', empresa: 'PlayStation', plataforma: 'PS Vita', precio: 900, estado: 'Usado', disponible: 'si' },
+    { nombre: 'Control DualShock 4', cantidad: 7, categoria: 'Controles y accesorios', empresa: 'PlayStation', plataforma: 'PlayStation 4', precio: 1300, estado: 'Usado', disponible: 'si' },
+    { nombre: 'Joy-Con (par)', cantidad: 3, categoria: 'Controles y accesorios', empresa: 'Nintendo', plataforma: 'Nintendo Switch', precio: 2100, estado: 'Nuevo', disponible: 'si' },
+    { nombre: 'Cable HDMI 2 m', cantidad: 15, categoria: 'Controles y accesorios', empresa: 'Otra', plataforma: 'Universal', precio: 250, estado: 'Nuevo', disponible: 'si' },
+    { nombre: 'Portgas D. Ace sentado', cantidad: 3, categoria: 'Figuras', estilo: 'Anime y manga', franquicia: 'One Piece', marca: 'Banpresto', autenticidad: 'Original (licencia oficial)', tamano: '16', precio: 1400, estado: 'Nuevo', disponible: 'si', destacado: true },
+    { nombre: 'Monkey D. Luffy con tarro', cantidad: 2, categoria: 'Figuras', estilo: 'Anime y manga', franquicia: 'One Piece', marca: 'Genérica', autenticidad: 'Alternativa / genérica', tamano: '15', precio: 650, estado: 'Nuevo', disponible: 'pocas' },
+    { nombre: 'Goku Super Saiyajin', cantidad: 4, categoria: 'Figuras', estilo: 'Anime y manga', franquicia: 'Dragon Ball', marca: 'Bandai', autenticidad: 'Original (licencia oficial)', tamano: '22', precio: 1900, estado: 'Nuevo', disponible: 'si' },
+    { nombre: 'Funko Pop! Mario', cantidad: 6, categoria: 'Figuras', estilo: 'Videojuegos', franquicia: 'Super Mario', marca: 'Funko', autenticidad: 'Original (licencia oficial)', tamano: '10', precio: 850, estado: 'Nuevo', disponible: 'si' },
+    { nombre: 'Spider-Man articulado', cantidad: 0, categoria: 'Figuras', estilo: 'Cómics y superhéroes', franquicia: 'Marvel', marca: 'Hasbro', autenticidad: 'Original (licencia oficial)', tamano: '15', precio: 1250, estado: 'Nuevo', disponible: 'agotado' },
   ];
 
   D.modelo = {
     CATEGORIAS, EMPRESAS, RETRO, ESTILOS_FIGURA, SUGERENCIAS, AUTENTICIDAD, ESTADOS, DISPONIBILIDAD, DEMO,
-    limpiar, validar, esRetro, apariencia, detalle,
+    limpiar, validar, esRetro, apariencia, detalle, dispPorCantidad,
   };
 })(window.DrMario);

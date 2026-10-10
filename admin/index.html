@@ -42,6 +42,21 @@
         .seg button[aria-pressed="true"].s-si { background: #10b981; color: #052e1f; }
         .seg button[aria-pressed="true"].s-pocas { background: #f59e0b; color: #3b2304; }
         .seg button[aria-pressed="true"].s-agotado { background: #FF2E63; color: #fff; }
+        /* ---- Dashboard ---- */
+        .tab[aria-selected="true"] { background: #08D9D6; color: #0B0F19; }
+        .periodo[aria-pressed="true"] { background: #1f2a44; color: #fff; border-color: #08D9D6; }
+        .viz-card { background: #161F33; border: 1px solid #1f2937; border-radius: 1.25rem; padding: 1.25rem; }
+        .viz-title { font-size: .95rem; font-weight: 700; color: #fff; }
+        .viz-sub { font-size: .75rem; color: #94a3b8; }
+        .viz svg { display: block; max-width: 100%; }
+        .viz svg text { font-family: 'Space Grotesk', sans-serif; }
+        .viz [data-tip] { cursor: default; }
+        .viz [data-tip]:hover { opacity: .85; }
+        #viz-tip { position: fixed; z-index: 70; pointer-events: none; background: #f8fafc; color: #0B0F19; font-size: .78rem; font-weight: 600;
+                   padding: .45rem .6rem; border-radius: .5rem; box-shadow: 0 8px 24px rgba(0,0,0,.4); white-space: nowrap; transform: translate(-50%, calc(-100% - 10px)); }
+        .tabla th { font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: #94a3b8; font-weight: 600; text-align: left; padding: .6rem .75rem; }
+        .tabla td { padding: .6rem .75rem; border-top: 1px solid #1f2937; vertical-align: middle; font-size: .875rem; }
+        .tabla tbody tr:hover { background: rgba(255,255,255,.02); }
     </style>
 </head>
 
@@ -71,7 +86,7 @@
     <!-- ================= PANEL ================= -->
     <section id="app" hidden>
         <header class="sticky top-0 z-30 bg-brand-dark/95 backdrop-blur border-b border-slate-800">
-            <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+            <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
                 <div class="flex items-center gap-3 min-w-0">
                     <img src="../assets/img/logo-128.webp" srcset="../assets/img/logo-128.webp 1x, ../assets/img/logo-256.webp 2x" alt="Videojuegos Dr.Mario" width="48" height="48" class="w-11 h-11 object-contain drop-shadow-[0_0_12px_rgba(255,46,99,0.45)]">
                     <div class="leading-tight min-w-0">
@@ -90,8 +105,79 @@
             </div>
         </header>
 
-        <main class="max-w-5xl mx-auto px-4 pt-6 pb-28">
-            <div class="grid grid-cols-3 gap-3 mb-6" id="stats"></div>
+        <main class="max-w-6xl mx-auto px-4 pt-6 pb-28">
+            <!-- Pestañas -->
+            <div class="flex items-center gap-2 mb-6 bg-brand-card border border-slate-800 rounded-2xl p-1.5 w-full sm:w-auto sm:inline-flex" role="tablist" aria-label="Secciones del panel">
+                <button class="tab flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-300" role="tab" id="tab-btn-dashboard" aria-controls="tab-dashboard" aria-selected="true" data-tab="dashboard">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                </button>
+                <button class="tab flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-300" role="tab" id="tab-btn-inventario" aria-controls="tab-inventario" aria-selected="false" data-tab="inventario">
+                    <i data-lucide="package" class="w-4 h-4"></i> Inventario
+                </button>
+            </div>
+
+            <!-- ============ DASHBOARD ============ -->
+            <section id="tab-dashboard" role="tabpanel" aria-labelledby="tab-btn-dashboard" class="viz space-y-5">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-2" role="group" aria-label="Periodo">
+                        <span class="text-xs text-slate-400 mr-1">Periodo</span>
+                        <button class="periodo px-3 py-1.5 rounded-lg border border-slate-700 text-sm font-semibold text-slate-300" data-dias="7" aria-pressed="false">7 días</button>
+                        <button class="periodo px-3 py-1.5 rounded-lg border border-slate-700 text-sm font-semibold text-slate-300" data-dias="30" aria-pressed="true">30 días</button>
+                        <button class="periodo px-3 py-1.5 rounded-lg border border-slate-700 text-sm font-semibold text-slate-300" data-dias="90" aria-pressed="false">90 días</button>
+                    </div>
+                    <button id="exportar" class="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-xl text-sm font-semibold">
+                        <i data-lucide="download" class="w-4 h-4"></i> Descargar reporte
+                    </button>
+                </div>
+                <p id="demo-clics" hidden class="text-xs text-brand-yellow flex items-center gap-2">
+                    <i data-lucide="info" class="w-4 h-4 shrink-0"></i>
+                    Demo: los clics de "Lo quiero" son de ejemplo. Los que hagas en el catálogo desde este dispositivo también se suman.
+                </p>
+
+                <div id="kpis" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+
+                <div class="grid lg:grid-cols-5 gap-5">
+                    <div class="viz-card lg:col-span-3 min-w-0 flex flex-col">
+                        <div class="flex items-start justify-between gap-3 mb-4">
+                            <div>
+                                <p class="viz-title">Clics en "Lo quiero"</p>
+                                <p class="viz-sub">Clientes que tocaron el botón de WhatsApp en un producto, por día</p>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <p id="clics-total" class="text-2xl font-bold text-white leading-none"></p>
+                                <p id="clics-prom" class="viz-sub mt-1"></p>
+                            </div>
+                        </div>
+                        <div id="chart-dias" class="flex-1 min-h-[14rem] min-w-0 overflow-hidden"></div>
+                    </div>
+                    <div class="viz-card lg:col-span-2 min-w-0">
+                        <p class="viz-title">Lo más pedido</p>
+                        <p class="viz-sub mb-4">Productos con más clics en el periodo</p>
+                        <div id="chart-top"></div>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-5">
+                    <div class="viz-card min-w-0">
+                        <div class="flex flex-wrap items-start justify-between gap-2 mb-4">
+                            <div>
+                                <p class="viz-title">Stock por tipo</p>
+                                <p class="viz-sub">Cuántos productos hay en cada estado</p>
+                            </div>
+                            <div id="leyenda-stock" class="flex flex-wrap gap-3 text-xs text-slate-300"></div>
+                        </div>
+                        <div id="chart-stock"></div>
+                    </div>
+                    <div class="viz-card min-w-0">
+                        <p class="viz-title flex items-center gap-2"><i data-lucide="bell-ring" class="w-4 h-4 text-brand-yellow"></i> Reponer pronto</p>
+                        <p class="viz-sub mb-3">Agotados o con pocas unidades, ordenados por lo que más piden</p>
+                        <div id="reposicion" class="divide-y divide-slate-800"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ INVENTARIO ============ -->
+            <section id="tab-inventario" role="tabpanel" aria-labelledby="tab-btn-inventario" hidden>
 
             <div class="flex flex-col sm:flex-row gap-2 mb-4">
                 <label class="relative flex-1">
@@ -105,13 +191,27 @@
                 </button>
             </div>
 
-            <div id="list" class="space-y-2" aria-live="polite"></div>
+            <!-- Tabla (compu) -->
+            <div class="hidden md:block bg-brand-card border border-slate-800 rounded-2xl overflow-x-auto">
+                <table class="tabla w-full">
+                    <thead><tr>
+                        <th class="w-16">Foto</th><th>Producto</th><th>Marca / Serie</th><th>Estado</th>
+                        <th class="text-right">Precio</th><th class="text-right">Unid.</th><th>Disponibilidad</th><th class="w-24"><span class="sr-only">Acciones</span></th>
+                    </tr></thead>
+                    <tbody id="tabla"></tbody>
+                </table>
+            </div>
+            <!-- Tarjetas (celular) -->
+            <div id="list" class="md:hidden space-y-2" aria-live="polite"></div>
             <p id="list-empty" hidden class="text-center text-slate-500 py-16">No hay productos con ese filtro.</p>
 
+            </section>
+
             <p id="demo-reset" hidden class="text-center mt-10">
-                <button class="text-xs text-slate-500 hover:text-brand-yellow underline">Reiniciar productos de la demo</button>
+                <button class="text-xs text-slate-500 hover:text-brand-yellow underline">Reiniciar productos y clics de la demo</button>
             </p>
         </main>
+        <div id="viz-tip" hidden role="status"></div>
 
         <!-- Botón flotante (celular) -->
         <button id="add-fab" aria-label="Agregar producto"
@@ -191,10 +291,14 @@
                 </div>
 
                 <!-- 4. Precio y estado -->
-                <div class="grid sm:grid-cols-2 gap-4">
+                <div class="grid sm:grid-cols-3 gap-4">
                     <div>
                         <label class="lbl" for="precio">Precio (C$) *</label>
                         <input id="precio" type="number" min="1" step="1" inputmode="numeric" class="field text-lg font-bold" placeholder="0" required>
+                    </div>
+                    <div>
+                        <label class="lbl" for="cantidad">Unidades en stock</label>
+                        <input id="cantidad" type="number" min="0" step="1" inputmode="numeric" class="field text-lg font-bold" placeholder="Opcional">
                     </div>
                     <fieldset>
                         <legend class="lbl">Estado</legend>
@@ -255,7 +359,9 @@
     <script src="../assets/js/capas/config.js"></script>
     <script src="../assets/js/capas/utilidades.js"></script>
     <script src="../assets/js/capas/modelo.js"></script>
+    <script src="../assets/js/capas/reportes.js"></script>
     <script src="../assets/js/capas/datos.js"></script>
+    <script src="dashboard.js"></script>
     <script src="admin.js"></script>
 </body>
 

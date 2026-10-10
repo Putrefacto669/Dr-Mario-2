@@ -13,6 +13,8 @@ window.DrMario = window.DrMario || {};
   const DEMO_KEY = 'drmario_demo_productos_v1';
   const CACHE_KEY = 'drmario_cache_productos_v1';
   const SESSION_KEY = 'drmario_admin_key';
+  const CLICS_KEY = 'drmario_demo_clics_v1';
+  const DIA = 24 * 60 * 60 * 1000;
   const modoDemo = !config.API_URL;
 
   const ls = {
@@ -24,6 +26,34 @@ window.DrMario = window.DrMario || {};
     let data = ls.get(DEMO_KEY);
     if (!Array.isArray(data)) { data = DEMO.map(limpiar); ls.set(DEMO_KEY, data); }
     return data.map(limpiar);
+  }
+
+  // Clics de ejemplo para que el dashboard de la demo no salga vacío.
+  // Son siempre los mismos (generador con semilla) y caen en los últimos 30 días.
+  function clicsDeEjemplo(productos) {
+    let semilla = 20261009;
+    const azar = () => ((semilla = (semilla * 1103515245 + 12345) % 2147483648) / 2147483648);
+    const peso = (p) => (p.destacado ? 3 : 1) + (p.disponible === 'agotado' ? 2.5 : 0) + (p.disponible === 'pocas' ? 1.5 : 0);
+    const bolsa = [];
+    productos.forEach((p) => { for (let i = 0; i < Math.round(peso(p) * 2); i++) bolsa.push(p.id); });
+    const clics = [];
+    const ahora = Date.now();
+    for (let d = 29; d >= 0; d--) {
+      const fecha = new Date(ahora - d * DIA);
+      const finde = [0, 6].includes(fecha.getDay());
+      const n = Math.round(3 + (29 - d) * 0.18 + (finde ? 4 : 0) + azar() * 4);
+      for (let i = 0; i < n; i++) {
+        const ts = ahora - d * DIA - Math.floor(azar() * DIA * 0.6);
+        clics.push({ id: bolsa[Math.floor(azar() * bolsa.length)], ts, ejemplo: true });
+      }
+    }
+    return clics;
+  }
+
+  function demoClics() {
+    let data = ls.get(CLICS_KEY);
+    if (!Array.isArray(data)) { data = clicsDeEjemplo(demoLeer()); ls.set(CLICS_KEY, data); }
+    return data;
   }
 
   async function api(body) {
@@ -110,7 +140,38 @@ window.DrMario = window.DrMario || {};
       await api({ action: 'delete', key: this.sesion(), id });
     },
 
-    reiniciarDemo() { if (modoDemo) ls.set(DEMO_KEY, DEMO.map(limpiar)); },
+    reiniciarDemo() {
+      if (!modoDemo) return;
+      const productos = DEMO.map(limpiar);
+      ls.set(DEMO_KEY, productos);
+      ls.set(CLICS_KEY, clicsDeEjemplo(productos));
+    },
+
+    // Cada vez que un cliente toca "Lo quiero" en el catálogo
+    registrarClic(producto) {
+      const clic = { id: producto.id, ts: Date.now() };
+      if (modoDemo) {
+        const data = demoClics();
+        data.push(clic);
+        ls.set(CLICS_KEY, data.slice(-5000));
+        return;
+      }
+      // No esperamos respuesta: el cliente se va directo a WhatsApp
+      try {
+        fetch(config.API_URL, { method: 'POST', body: JSON.stringify({ action: 'click', id: producto.id }), keepalive: true, mode: 'no-cors' });
+      } catch { /* si falla, no pasa nada */ }
+    },
+
+    // Clics de los últimos N días, para el dashboard (requiere sesión de admin)
+    async clics({ dias = 90 } = {}) {
+      const desde = Date.now() - dias * DIA;
+      if (modoDemo) return demoClics().filter((c) => c.ts >= desde);
+      const data = await api({ action: 'stats', key: this.sesion(), dias });
+      return (data.clics || []).map((c) => ({ id: String(c.id), ts: Number(c.ts) })).filter((c) => c.ts >= desde);
+    },
+
+    // ¿Los clics de la demo son de ejemplo?
+    clicsSonDeEjemplo() { return modoDemo; },
     comprimirImagen,
   };
 })(window.DrMario);

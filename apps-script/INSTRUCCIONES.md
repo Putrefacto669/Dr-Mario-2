@@ -49,6 +49,13 @@ El PIN solo vive ahí, nunca en la página. Si alguien falla 8 veces, el admin s
 Listo: la franja amarilla de demo desaparece, el catálogo lee de la hoja y el Doc
 entra a `.../admin/` con su PIN.
 
+## Dashboard y reportes
+
+- Cada vez que un cliente toca **"Lo quiero"** en el catálogo se guarda una fila en la pestaña **Clics** (fecha y producto). No necesita PIN y tiene un freno de 600 clics por minuto contra abusos.
+- El dashboard del panel lee esos clics (con PIN) y calcula los reportes: clics por día, lo más pedido, stock por tipo, valor del inventario y qué reponer.
+- La columna **cantidad** (unidades en stock) es opcional. Si una hoja vieja no la tiene, el script la agrega sola al final.
+- **Si ya tenías el script instalado:** pega el `Code.gs` nuevo y crea una **versión nueva** de la implementación (ver abajo). Si no, los clics no se registran.
+
 ## Cosas a saber
 
 - **Cambios en el script:** si editas `Code.gs`, ve a **Implementar → Administrar implementaciones → editar → Versión: nueva**. Si no, sigue corriendo la versión vieja.

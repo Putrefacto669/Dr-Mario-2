@@ -12,9 +12,11 @@
  */
 
 const HOJA = 'Productos';
+const HOJA_CLICS = 'Clics';
+const MAX_CLICS_MINUTO = 600;   // freno anti-abuso para el contador público
 const CARPETA_FOTOS = 'Catálogo Dr.Mario - Fotos';
 const COLUMNAS = ['id', 'nombre', 'categoria', 'empresa', 'plataforma', 'estilo', 'franquicia', 'marca',
-  'autenticidad', 'tamano', 'precio', 'estado', 'disponible', 'imagen', 'destacado', 'visible', 'actualizado'];
+  'autenticidad', 'tamano', 'precio', 'estado', 'disponible', 'cantidad', 'imagen', 'destacado', 'visible', 'actualizado'];
 const MAX_INTENTOS = 8;
 const BLOQUEO_SEG = 15 * 60;
 
@@ -31,6 +33,10 @@ function doPost(e) {
   try { body = JSON.parse(e.postData.contents); } catch (err) { return json({ ok: false, error: 'Solicitud inválida' }); }
 
   const cache = CacheService.getScriptCache();
+
+  // Público: el catálogo cuenta un "Lo quiero" (no necesita PIN)
+  if (body.action === 'click') return json(registrarClic(String(body.id || ''), cache));
+
   const fallos = Number(cache.get('fallos') || 0);
   if (fallos >= MAX_INTENTOS) return json({ ok: false, error: 'Demasiados intentos. Espera 15 minutos.' });
 
@@ -49,6 +55,7 @@ function doPost(e) {
       case 'ping': return json({ ok: true });
       case 'save': return json({ ok: true, producto: guardarProducto(body.producto || {}, body.imagen) });
       case 'delete': borrarProducto(String(body.id || '')); return json({ ok: true });
+      case 'stats': return json({ ok: true, clics: leerClics(Number(body.dias) || 90) });
       default: return json({ ok: false, error: 'Acción desconocida' });
     }
   } catch (err) {
@@ -67,8 +74,17 @@ function hoja() {
     sh.appendRow(COLUMNAS);
     sh.setFrozenRows(1);
     sh.getRange(1, 1, 1, COLUMNAS.length).setFontWeight('bold');
+  } else {
+    // Si la hoja es de una versión anterior, agrega las columnas que falten al final
+    const cab = cabecera(sh);
+    const faltan = COLUMNAS.filter((c) => cab.indexOf(c) < 0);
+    if (faltan.length) sh.getRange(1, cab.length + 1, 1, faltan.length).setValues([faltan]).setFontWeight('bold');
   }
   return sh;
+}
+
+function cabecera(sh) {
+  return sh.getRange(1, 1, 1, Math.max(1, sh.getLastColumn())).getValues()[0].map(String).filter((c) => c !== '');
 }
 
 function leerProductos() {
@@ -104,6 +120,7 @@ function guardarProducto(p, imagen) {
     precio: Math.max(0, Math.round(Number(p.precio) || 0)),
     estado: texto(p.estado, 20),
     disponible: ['si', 'pocas', 'agotado'].indexOf(p.disponible) >= 0 ? p.disponible : 'si',
+    cantidad: p.cantidad === null || p.cantidad === undefined || p.cantidad === '' ? '' : Math.max(0, Math.round(Number(p.cantidad) || 0)),
     imagen: /^https:\/\//.test(String(p.imagen || '')) ? String(p.imagen) : '',
     destacado: p.destacado ? 'Sí' : 'No',
     visible: p.visible === false ? 'No' : 'Sí',
@@ -111,7 +128,7 @@ function guardarProducto(p, imagen) {
   };
   if (!valores.nombre) throw new Error('El producto necesita nombre');
 
-  const fila = COLUMNAS.map((c) => valores[c]);
+  const fila = cabecera(sh).map((c) => (c in valores ? valores[c] : ''));
   const ids = sh.getRange(1, 1, sh.getLastRow(), 1).getValues().map((r) => String(r[0]));
   const i = ids.indexOf(id);
   if (i > 0) sh.getRange(i + 1, 1, 1, fila.length).setValues([fila]);
@@ -126,6 +143,39 @@ function borrarProducto(id) {
   const ids = sh.getRange(1, 1, sh.getLastRow(), 1).getValues().map((r) => String(r[0]));
   const i = ids.indexOf(id);
   if (i > 0) sh.deleteRow(i + 1);
+}
+
+/* ---------- Clics de "Lo quiero" ---------- */
+function hojaClics() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(HOJA_CLICS);
+  if (!sh) {
+    sh = ss.insertSheet(HOJA_CLICS);
+    sh.appendRow(['ts', 'id', 'fecha']);
+    sh.setFrozenRows(1);
+  }
+  return sh;
+}
+
+function registrarClic(id, cache) {
+  if (!/^[\w-]{1,64}$/.test(id)) return { ok: false, error: 'Producto inválido' };
+  const llave = 'clics_' + Math.floor(Date.now() / 60000);
+  const n = Number(cache.get(llave) || 0);
+  if (n >= MAX_CLICS_MINUTO) return { ok: false, error: 'Demasiados clics' };
+  cache.put(llave, String(n + 1), 120);
+  const ahora = new Date();
+  hojaClics().appendRow([ahora.getTime(), id, ahora]);
+  return { ok: true };
+}
+
+function leerClics(dias) {
+  const sh = hojaClics();
+  const total = sh.getLastRow() - 1;
+  if (total <= 0) return [];
+  const leer = Math.min(total, 20000);                      // los más recientes
+  const datos = sh.getRange(sh.getLastRow() - leer + 1, 1, leer, 2).getValues();
+  const desde = Date.now() - Math.min(dias, 366) * 24 * 60 * 60 * 1000;
+  return datos.filter((f) => Number(f[0]) >= desde).map((f) => ({ ts: Number(f[0]), id: String(f[1]) }));
 }
 
 /* ---------- Fotos en Drive ---------- */
@@ -164,6 +214,7 @@ function json(obj) {
 /** Ejecuta esta función una vez desde el editor para crear la hoja y dar permisos. */
 function configurar() {
   hoja();
+  hojaClics();
   carpetaFotos();
   if (!PropertiesService.getScriptProperties().getProperty('ADMIN_KEY')) {
     Logger.log('Falta ADMIN_KEY: agrégala en Configuración del proyecto → Propiedades del script.');

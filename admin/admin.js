@@ -1,6 +1,7 @@
 /* ==========================================================
-   CAPA 4 · PRESENTACIÓN — Inventario (panel del Doc)
-   Formularios y lista. Reglas en DrMario.modelo, guardado en DrMario.datos.
+   CAPA 4 · PRESENTACIÓN — Panel del Doc (dashboard + inventario)
+   Formularios y lista. Reglas en DrMario.modelo, cálculos en
+   DrMario.reportes, guardado en DrMario.datos, gráficas en dashboard.js.
    ========================================================== */
 const D = window.DrMario;
 const Store = D.datos;
@@ -34,14 +35,40 @@ $('#login-form').addEventListener('submit', async (e) => {
 });
 $('#logout').addEventListener('click', () => { Store.salir(); location.reload(); });
 
+const Dash = window.DrMarioDashboard;
+
 async function abrirPanel() {
     $('#login').hidden = true; $('#app').hidden = false;
+    Dash.iniciar({ onEditar: (id) => { const p = productos.find((x) => x.id === id); if (p) abrirEditor(p); } });
+    mostrarTab(sessionStorage.getItem('drmario_tab') || 'dashboard');
     icons();
     $('#list').innerHTML = '<p class="text-center text-slate-500 py-16">Cargando productos…</p>';
-    try { productos = await Store.listar({ todos: true }); }
-    catch (err) { toast('No se pudieron cargar los productos'); console.warn(err); }
+    let clics = [];
+    try {
+        [productos, clics] = await Promise.all([
+            Store.listar({ todos: true }),
+            Store.clics({ dias: 90 }).catch((err) => { console.warn(err); toast('No se pudieron cargar los reportes'); return []; }),
+        ]);
+    } catch (err) { toast('No se pudieron cargar los productos'); console.warn(err); }
     pintarLista();
+    Dash.actualizar(productos, clics);
 }
+
+// Vuelve a pintar todo después de un cambio
+function refrescar() { pintarLista(); Dash.actualizar(productos); }
+
+/* ================= PESTAÑAS ================= */
+function mostrarTab(nombre) {
+    document.querySelectorAll('[data-tab]').forEach((b) => {
+        const activo = b.dataset.tab === nombre;
+        b.setAttribute('aria-selected', String(activo));
+        $('#tab-' + b.dataset.tab).hidden = !activo;
+    });
+    try { sessionStorage.setItem('drmario_tab', nombre); } catch { /* nada */ }
+    $('#add-fab').classList.toggle('!hidden', nombre !== 'inventario');
+    if (nombre === 'dashboard') Dash.pintar();
+}
+document.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => mostrarTab(b.dataset.tab)));
 
 /* ================= LISTA ================= */
 $('#f-cat').innerHTML = ['<option value="">Todos los tipos</option>', ...CATEGORIAS.map((c) => `<option>${c.id}</option>`)].join('');
@@ -49,68 +76,98 @@ $('#q').addEventListener('input', pintarLista);
 $('#f-cat').addEventListener('change', pintarLista);
 
 function pintarLista() {
-    const total = productos.length;
-    const disp = productos.filter((p) => p.disponible !== 'agotado').length;
-    $('#stats').innerHTML = [
-        ['Productos', total, 'text-white'], ['Disponibles', disp, 'text-emerald-400'], ['Agotados', total - disp, 'text-brand-red'],
-    ].map(([l, n, c]) => `<div class="bg-brand-card border border-slate-800 rounded-2xl p-4"><p class="text-2xl font-bold ${c}">${n}</p><p class="text-xs text-slate-400">${l}</p></div>`).join('');
-
     const q = norm($('#q').value), cat = $('#f-cat').value;
     const lista = productos.filter((p) => (!cat || p.categoria === cat)
         && (!q || norm([p.nombre, p.plataforma, p.franquicia, p.marca, p.empresa].join(' ')).includes(q)));
 
+    const thumb = (p, tam) => {
+        const ap = M.apariencia(p);
+        return p.imagen
+            ? `<img src="${esc(p.imagen)}" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">`
+            : `<i data-lucide="${ap.icono}" class="${tam}" style="color:${ap.color}"></i>`;
+    };
+    const seg = (p) => `<div class="seg inline-flex bg-[#0f1626] border border-slate-700 rounded-xl p-1" role="group" aria-label="Disponibilidad">${
+        Object.entries({ si: 'Hay', pocas: 'Pocas', agotado: 'Agotado' }).map(([k, l]) =>
+            `<button type="button" data-disp="${k}" class="s-${k} px-2.5 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white" aria-pressed="${p.disponible === k}">${l}</button>`).join('')}</div>`;
+    const etiquetas = (p) => `${p.destacado ? ' <span class="font-pixel text-[8px] bg-brand-yellow text-slate-900 px-1.5 py-1 rounded align-middle">TOP</span>' : ''}${p.visible ? '' : ' <span class="text-[10px] font-bold bg-slate-700 text-slate-200 px-1.5 py-0.5 rounded align-middle">OCULTO</span>'}`;
+    const acciones = (p) => `
+        <button type="button" data-edit class="w-10 h-10 rounded-xl hover:bg-slate-800 inline-flex items-center justify-center" aria-label="Editar ${esc(p.nombre)}"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+        <button type="button" data-del class="w-10 h-10 rounded-xl hover:bg-brand-red/20 text-slate-400 hover:text-brand-red inline-flex items-center justify-center" aria-label="Borrar ${esc(p.nombre)}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+    const unidades = (p) => (p.cantidad === null ? '—' : p.cantidad);
+
     $('#list-empty').hidden = lista.length > 0;
+
+    // Tabla (compu)
+    $('#tabla').innerHTML = lista.map((p) => {
+        const ap = M.apariencia(p);
+        const marca = p.categoria === 'Figuras' ? (p.franquicia || '—') : (p.empresa || '—');
+        const sub = p.categoria === 'Figuras' ? [p.estilo, p.marca].filter(Boolean).join(' · ') : p.plataforma;
+        return `
+        <tr data-id="${esc(p.id)}" class="${p.visible ? '' : 'opacity-60'}">
+            <td><div class="w-12 h-12 rounded-lg bg-[#0f1626] overflow-hidden flex items-center justify-center">${thumb(p, 'w-5 h-5')}</div></td>
+            <td class="max-w-[16rem]"><p class="font-semibold text-white truncate">${esc(p.nombre)}${etiquetas(p)}</p><p class="text-xs text-slate-500">${esc(p.categoria)}</p></td>
+            <td><p class="text-white">${esc(marca)}</p><p class="text-xs truncate max-w-[12rem]" style="color:${ap.color}">${esc(sub || '')}</p></td>
+            <td class="text-slate-300">${esc(p.estado || '—')}</td>
+            <td class="text-right font-semibold text-white tabular-nums whitespace-nowrap">${fmt(p.precio)}</td>
+            <td class="text-right tabular-nums text-slate-300">${unidades(p)}</td>
+            <td>${seg(p)}</td>
+            <td class="text-right whitespace-nowrap">${acciones(p)}</td>
+        </tr>`;
+    }).join('');
+
+    // Tarjetas (celular)
     $('#list').innerHTML = lista.map((p) => {
         const ap = M.apariencia(p);
-        const thumb = p.imagen
-            ? `<img src="${esc(p.imagen)}" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">`
-            : `<i data-lucide="${ap.icono}" class="w-6 h-6" style="color:${ap.color}"></i>`;
-        const seg = Object.entries({ si: 'Hay', pocas: 'Pocas', agotado: 'Agotado' }).map(([k, l]) =>
-            `<button type="button" data-disp="${k}" class="s-${k} px-2.5 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white" aria-pressed="${p.disponible === k}">${l}</button>`).join('');
         return `
-        <div class="bg-brand-card border border-slate-800 rounded-2xl p-3 flex flex-wrap sm:flex-nowrap items-center gap-3 ${p.visible ? '' : 'opacity-60'}" data-id="${esc(p.id)}">
-            <div class="w-14 h-14 rounded-xl bg-[#0f1626] overflow-hidden flex items-center justify-center shrink-0">${thumb}</div>
+        <div class="bg-brand-card border border-slate-800 rounded-2xl p-3 flex flex-wrap items-center gap-3 ${p.visible ? '' : 'opacity-60'}" data-id="${esc(p.id)}">
+            <div class="w-14 h-14 rounded-xl bg-[#0f1626] overflow-hidden flex items-center justify-center shrink-0">${thumb(p, 'w-6 h-6')}</div>
             <div class="flex-1 min-w-0">
-                <p class="font-bold text-white truncate">${esc(p.nombre)} ${p.destacado ? '<span class="font-pixel text-[8px] bg-brand-yellow text-slate-900 px-1.5 py-1 rounded align-middle">TOP</span>' : ''} ${p.visible ? '' : '<span class="text-[10px] font-bold bg-slate-700 text-slate-200 px-1.5 py-0.5 rounded align-middle">OCULTO</span>'}</p>
+                <p class="font-bold text-white truncate">${esc(p.nombre)}${etiquetas(p)}</p>
                 <p class="text-xs text-slate-400 truncate"><span style="color:${ap.color}">${esc(ap.etiqueta)}</span> · ${esc(M.detalle(p))}</p>
-                <p class="text-sm font-bold text-white mt-0.5">${fmt(p.precio)}</p>
+                <p class="text-sm font-bold text-white mt-0.5">${fmt(p.precio)}${p.cantidad !== null ? ` <span class="text-xs font-normal text-slate-400">· ${p.cantidad} unid.</span>` : ''}</p>
             </div>
-            <div class="flex items-center gap-2 w-full sm:w-auto justify-between">
-                <div class="seg flex bg-[#0f1626] border border-slate-700 rounded-xl p-1" role="group" aria-label="Disponibilidad">${seg}</div>
-                <div class="flex">
-                    <button type="button" data-edit class="w-10 h-10 rounded-xl hover:bg-slate-800 flex items-center justify-center" aria-label="Editar ${esc(p.nombre)}"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                    <button type="button" data-del class="w-10 h-10 rounded-xl hover:bg-brand-red/20 text-slate-400 hover:text-brand-red flex items-center justify-center" aria-label="Borrar ${esc(p.nombre)}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                </div>
+            <div class="flex items-center gap-2 w-full justify-between">
+                ${seg(p)}
+                <div class="flex">${acciones(p)}</div>
             </div>
         </div>`;
     }).join('');
     icons();
 }
 
-$('#list').addEventListener('click', async (e) => {
+async function clicEnFila(e) {
     const row = e.target.closest('[data-id]'); if (!row) return;
     const p = productos.find((x) => x.id === row.dataset.id); if (!p) return;
 
     const dispBtn = e.target.closest('[data-disp]');
     if (dispBtn) {                          // cambio rápido de disponibilidad
-        const antes = p.disponible;
-        if (antes === dispBtn.dataset.disp) return;
-        p.disponible = dispBtn.dataset.disp; pintarLista();
+        const antes = { disponible: p.disponible, cantidad: p.cantidad };
+        if (antes.disponible === dispBtn.dataset.disp) return;
+        p.disponible = dispBtn.dataset.disp;
+        // Mantiene las unidades coherentes con el cambio rápido
+        if (p.disponible === 'agotado' && p.cantidad) p.cantidad = 0;
+        else if (p.disponible !== 'agotado' && p.cantidad === 0) p.cantidad = null;
+        refrescar();
         try { await Store.guardar(p); toast(`${p.nombre}: ${DISPONIBILIDAD[p.disponible]}`); }
-        catch (err) { p.disponible = antes; pintarLista(); toast('No se guardó: ' + err.message); }
+        catch (err) { Object.assign(p, antes); refrescar(); toast('No se guardó: ' + err.message); }
         return;
     }
     if (e.target.closest('[data-edit]')) return abrirEditor(p);
     if (e.target.closest('[data-del]')) {
         if (!confirm(`¿Borrar "${p.nombre}" del catálogo?\nSi solo se acabó, mejor márcalo como Agotado.`)) return;
-        try { await Store.borrar(p.id); productos = productos.filter((x) => x.id !== p.id); pintarLista(); toast('Producto borrado'); }
+        try { await Store.borrar(p.id); productos = productos.filter((x) => x.id !== p.id); refrescar(); toast('Producto borrado'); }
         catch (err) { toast('No se pudo borrar: ' + err.message); }
     }
-});
+}
+$('#list').addEventListener('click', clicEnFila);
+$('#tabla').addEventListener('click', clicEnFila);
 
 $('#demo-reset button').addEventListener('click', async () => {
-    if (!confirm('¿Volver a los productos de ejemplo? Se borran los que agregaste en la demo.')) return;
-    Store.reiniciarDemo(); productos = await Store.listar({ todos: true }); pintarLista(); toast('Demo reiniciada');
+    if (!confirm('¿Volver a los productos y clics de ejemplo? Se borra lo que agregaste en la demo.')) return;
+    Store.reiniciarDemo();
+    productos = await Store.listar({ todos: true });
+    pintarLista(); Dash.actualizar(productos, await Store.clics({ dias: 90 }));
+    toast('Demo reiniciada');
 });
 
 /* ================= EDITOR ================= */
@@ -152,6 +209,11 @@ function actualizarSecciones() {
 form.addEventListener('change', (e) => {
     if (['categoria', 'empresa'].includes(e.target.name)) actualizarSecciones();
 });
+// Al escribir las unidades, sugiere la disponibilidad (se puede cambiar a mano)
+$('#cantidad').addEventListener('input', (e) => {
+    const sugerida = M.dispPorCantidad(e.target.value);
+    if (sugerida) setRadio('disponible', sugerida);
+});
 
 function pintarFoto(src) {
     $('#foto-prev').innerHTML = src ? `<img src="${esc(src)}" alt="Foto del producto" class="w-full h-full object-cover">` : '<i data-lucide="image" class="w-7 h-7 text-slate-600"></i>';
@@ -184,6 +246,7 @@ function abrirEditor(p = null) {
     $('#marca').value = p ? p.marca : '';
     $('#tamano').value = p ? p.tamano : '';
     $('#precio').value = p ? p.precio : '';
+    $('#cantidad').value = p && p.cantidad !== null ? p.cantidad : '';
     $('#destacado').checked = p ? p.destacado : false;
     $('#visible').checked = p ? p.visible : true;
     pintarFoto(fotoActual);
@@ -213,6 +276,7 @@ function leerFormulario() {
         autenticidad: esFigura ? val('autenticidad') : '',
         tamano: esFigura ? $('#tamano').value : '',
         precio: Number($('#precio').value),
+        cantidad: $('#cantidad').value === '' ? null : Number($('#cantidad').value),
         estado: val('estado'),
         disponible: val('disponible') || 'si',
         imagen: fotoActual,
@@ -233,7 +297,7 @@ form.addEventListener('submit', async (e) => {
         const guardado = await Store.guardar(p, fotoNueva);
         const i = productos.findIndex((x) => x.id === guardado.id);
         if (i >= 0) productos[i] = guardado; else productos.unshift(guardado);
-        cerrarEditor(); pintarLista();
+        cerrarEditor(); refrescar();
         toast(editando ? 'Cambios guardados' : 'Producto agregado al catálogo');
     } catch (err) {
         $('#form-error').textContent = 'No se pudo guardar: ' + err.message;

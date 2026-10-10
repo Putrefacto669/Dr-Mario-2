@@ -66,7 +66,7 @@ function tarjeta(p) {
             <div class="mt-auto pt-3">
                 <p class="text-lg sm:text-xl font-bold text-white">${fmt(p.precio)}</p>
                 <p class="flex items-center gap-1.5 text-xs text-slate-400 mt-1"><span class="w-2 h-2 rounded-full ${punto}"></span>${DISPONIBILIDAD[p.disponible]}</p>
-                <a href="${waLink(p)}" target="_blank" rel="noopener"
+                <a href="${waLink(p)}" target="_blank" rel="noopener" data-lo-quiero="${esc(p.id)}"
                     class="mt-3 w-full inline-flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold transition-colors ${agotado ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' : 'bg-emerald-500 text-slate-950 hover:bg-emerald-400'}">
                     <i data-lucide="${agotado ? 'bell' : 'message-circle'}" class="w-4 h-4"></i>${agotado ? 'Avisarme' : 'Lo quiero'}
                 </a>
@@ -98,6 +98,14 @@ function render() {
     $('#empty-wa').href = `https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(`Hola Dr. Mario, ¿tienen ${state.q || 'este producto'}?`)}`;
     if (window.lucide) lucide.createIcons();
 }
+
+// Cuenta cada "Lo quiero" / "Avisarme" para los reportes del dashboard
+document.addEventListener('click', (e) => {
+    const a = e.target.closest('[data-lo-quiero]');
+    if (!a) return;
+    const p = productos.find((x) => x.id === a.dataset.loQuiero);
+    if (p) Store.registrarClic(p);
+});
 
 async function init() {
     $('#year').textContent = new Date().getFullYear();
