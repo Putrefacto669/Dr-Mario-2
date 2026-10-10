@@ -165,6 +165,23 @@
         </p>
     </footer>
 
+    <!-- Barra inferior (celular) -->
+    <nav aria-label="Accesos rápidos"
+        class="md:hidden fixed bottom-0 inset-x-0 z-50 bg-brand-dark/95 backdrop-blur-md border-t border-slate-800 pb-[env(safe-area-inset-bottom)]">
+        <div class="grid grid-cols-3 h-16 text-[11px] font-semibold">
+            <a href="../Home-Landing/index.html" class="flex flex-col items-center justify-center gap-1 text-slate-300">
+                <i data-lucide="home" class="w-5 h-5"></i>Inicio
+            </a>
+            <a href="#" id="barra-catalogo" class="flex flex-col items-center justify-center gap-1 text-brand-cyan" aria-current="page">
+                <i data-lucide="shopping-bag" class="w-5 h-5"></i>Catálogo
+            </a>
+            <a href="https://wa.me/50583807800?text=Hola%20Dr.%20Mario,%20vi%20el%20cat%C3%A1logo%20y%20tengo%20una%20consulta" target="_blank" rel="noopener"
+                class="flex flex-col items-center justify-center gap-1 text-emerald-400">
+                <i data-lucide="message-circle" class="w-5 h-5"></i>WhatsApp
+            </a>
+        </div>
+    </nav>
+
     <!-- Capas: config → utilidades → modelo → datos → presentación -->
     <script src="../assets/js/capas/config.js"></script>
     <script src="../assets/js/capas/utilidades.js"></script>

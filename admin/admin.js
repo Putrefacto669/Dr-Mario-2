@@ -41,6 +41,7 @@ async function abrirPanel() {
     $('#login').hidden = true; $('#app').hidden = false;
     Dash.iniciar({ onEditar: (id) => { const p = productos.find((x) => x.id === id); if (p) abrirEditor(p); } });
     mostrarTab(sessionStorage.getItem('drmario_tab') || 'dashboard');
+    guiaInicial();
     icons();
     $('#list').innerHTML = '<p class="text-center text-slate-500 py-16">Cargando productos…</p>';
     let clics = [];
@@ -258,6 +259,30 @@ function cerrarEditor() { $('#editor').hidden = true; document.body.style.overfl
 document.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', cerrarEditor));
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#editor').hidden) cerrarEditor(); });
 $('#add-btn').addEventListener('click', () => abrirEditor());
+$('#add-btn-dash').addEventListener('click', () => abrirEditor());
+
+/* ================= GUÍA DE BIENVENIDA ================= */
+const GUIA_KEY = 'drmario_guia_vista';
+function mostrarGuia(ver) {
+    $('#guia').hidden = !ver;
+    if (ver) { mostrarTab('dashboard'); $('#guia').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+}
+$('#guia-cerrar').addEventListener('click', () => {
+    mostrarGuia(false);
+    try { localStorage.setItem(GUIA_KEY, '1'); } catch { /* nada */ }
+});
+$('#ayuda').addEventListener('click', () => mostrarGuia($('#guia').hidden));
+$('#guia').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-guia]'); if (!b) return;
+    if (b.dataset.guia === 'agregar') abrirEditor();
+    if (b.dataset.guia === 'inventario') mostrarTab('inventario');
+    if (b.dataset.guia === 'reportes') $('#titulo-reponer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+function guiaInicial() {
+    let vista = false;
+    try { vista = localStorage.getItem(GUIA_KEY) === '1'; } catch { /* nada */ }
+    $('#guia').hidden = vista;
+}
 $('#add-fab').addEventListener('click', () => abrirEditor());
 
 function leerFormulario() {

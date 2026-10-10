@@ -119,7 +119,8 @@ window.DrMario = window.DrMario || {};
   function detalle(p) {
     if (p.categoria === 'Figuras') {
       const orig = p.autenticidad ? (p.autenticidad.startsWith('Original') ? 'Original' : 'Genérica') : '';
-      return ['Figura', p.marca, orig, p.tamano ? `${p.tamano} cm` : ''].filter(Boolean).join(' · ');
+      const marca = orig && D.util.norm(p.marca) === D.util.norm(orig) ? '' : p.marca;   // evita "Genérica · Genérica"
+      return ['Figura', marca, orig, p.tamano ? `${p.tamano} cm` : ''].filter(Boolean).join(' · ');
     }
     return [p.categoria, p.estado].filter(Boolean).join(' · ');
   }

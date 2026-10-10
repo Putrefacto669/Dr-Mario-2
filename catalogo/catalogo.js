@@ -111,6 +111,12 @@ async function init() {
     $('#year').textContent = new Date().getFullYear();
     $('#demo-banner').hidden = !Store.modoDemo;
 
+    // Llegando desde la landing: ?q=nombre o ?cat=Tipo
+    const params = new URLSearchParams(location.search);
+    if (params.get('q')) { state.q = params.get('q'); $('#q').value = state.q; }
+    if (CATEGORIAS.some((c) => c.id === params.get('cat'))) state.categoria = params.get('cat');
+    $('#barra-catalogo').addEventListener('click', (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
     pintarChips($('#category-chips'), ['Todo', ...CATEGORIAS.map((c) => c.id)], state.categoria);
     pintarSub();
     $('#category-chips').addEventListener('click', (e) => {

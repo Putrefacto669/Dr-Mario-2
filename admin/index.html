@@ -95,6 +95,9 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-1">
+                    <button id="ayuda" type="button" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-300 hover:text-brand-yellow px-3 py-2 rounded-lg" aria-label="Cómo usar el panel">
+                        <i data-lucide="circle-help" class="w-4 h-4"></i><span class="hidden sm:inline">Ayuda</span>
+                    </button>
                     <a href="../catalogo/index.html" target="_blank" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-300 hover:text-brand-cyan px-3 py-2 rounded-lg">
                         <i data-lucide="external-link" class="w-4 h-4"></i><span class="hidden sm:inline">Ver catálogo</span>
                     </a>
@@ -118,6 +121,46 @@
 
             <!-- ============ DASHBOARD ============ -->
             <section id="tab-dashboard" role="tabpanel" aria-labelledby="tab-btn-dashboard" class="viz space-y-5">
+                <!-- Guía de bienvenida -->
+                <div id="guia" hidden class="rounded-3xl border border-brand-cyan/40 bg-gradient-to-br from-[#0f2a33] to-brand-card p-5 sm:p-6">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-center gap-4">
+                            <img src="../assets/img/logo-128.webp" alt="" class="hidden sm:block w-14 h-14 object-contain">
+                            <div>
+                                <p class="text-lg sm:text-xl font-bold text-white">Así se usa su panel</p>
+                                <p class="text-sm text-slate-300 mt-1">Todo lo que cambie aquí lo ven sus clientes en el catálogo.</p>
+                            </div>
+                        </div>
+                        <button id="guia-cerrar" type="button" class="shrink-0 text-sm font-semibold text-slate-300 hover:text-white px-3 py-2 rounded-lg hover:bg-white/5">Entendido</button>
+                    </div>
+                    <div class="grid sm:grid-cols-3 gap-3 mt-5">
+                        <div class="rounded-2xl bg-black/20 border border-white/5 p-4 flex flex-col">
+                            <i data-lucide="plus-circle" class="w-6 h-6 text-brand-red"></i>
+                            <p class="font-bold text-white mt-3">Agregar un producto</p>
+                            <p class="text-sm text-slate-400 mt-1 flex-1">Nombre, precio y una foto con el cel. Al guardar ya sale en el catálogo.</p>
+                            <button type="button" data-guia="agregar" class="mt-4 inline-flex items-center justify-center gap-2 bg-brand-red hover:bg-[#ff4777] text-white font-bold py-2.5 rounded-xl text-sm">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Agregar producto
+                            </button>
+                        </div>
+                        <div class="rounded-2xl bg-black/20 border border-white/5 p-4 flex flex-col">
+                            <i data-lucide="toggle-right" class="w-6 h-6 text-brand-yellow"></i>
+                            <p class="font-bold text-white mt-3">Marcar lo que se acaba</p>
+                            <p class="text-sm text-slate-400 mt-1 flex-1">En Inventario toque <b class="text-slate-200">Hay</b>, <b class="text-slate-200">Pocas</b> o <b class="text-slate-200">Agotado</b>. Se guarda solo.</p>
+                            <button type="button" data-guia="inventario" class="mt-4 inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold py-2.5 rounded-xl text-sm">
+                                <i data-lucide="package" class="w-4 h-4"></i> Ir al inventario
+                            </button>
+                        </div>
+                        <div class="rounded-2xl bg-black/20 border border-white/5 p-4 flex flex-col">
+                            <i data-lucide="bar-chart-3" class="w-6 h-6 text-brand-cyan"></i>
+                            <p class="font-bold text-white mt-3">Ver qué le piden</p>
+                            <p class="text-sm text-slate-400 mt-1 flex-1">Cada vez que un cliente toca "Lo quiero" se cuenta aquí, y le avisamos qué conviene reponer.</p>
+                            <button type="button" data-guia="reportes" class="mt-4 inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold py-2.5 rounded-xl text-sm">
+                                <i data-lucide="bell-ring" class="w-4 h-4"></i> Ver qué reponer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div class="flex items-center gap-2" role="group" aria-label="Periodo">
                         <span class="text-xs text-slate-400 mr-1">Periodo</span>
@@ -125,9 +168,14 @@
                         <button class="periodo px-3 py-1.5 rounded-lg border border-slate-700 text-sm font-semibold text-slate-300" data-dias="30" aria-pressed="true">30 días</button>
                         <button class="periodo px-3 py-1.5 rounded-lg border border-slate-700 text-sm font-semibold text-slate-300" data-dias="90" aria-pressed="false">90 días</button>
                     </div>
-                    <button id="exportar" class="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-xl text-sm font-semibold">
-                        <i data-lucide="download" class="w-4 h-4"></i> Descargar reporte
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button id="exportar" class="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-xl text-sm font-semibold">
+                            <i data-lucide="download" class="w-4 h-4"></i> <span class="hidden sm:inline">Descargar</span> reporte
+                        </button>
+                        <button id="add-btn-dash" class="inline-flex items-center gap-2 bg-brand-red hover:bg-[#ff4777] text-white px-4 py-2 rounded-xl text-sm font-bold">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Agregar producto
+                        </button>
+                    </div>
                 </div>
                 <p id="demo-clics" hidden class="text-xs text-brand-yellow flex items-center gap-2">
                     <i data-lucide="info" class="w-4 h-4 shrink-0"></i>
@@ -169,7 +217,7 @@
                         <div id="chart-stock"></div>
                     </div>
                     <div class="viz-card min-w-0">
-                        <p class="viz-title flex items-center gap-2"><i data-lucide="bell-ring" class="w-4 h-4 text-brand-yellow"></i> Reponer pronto</p>
+                        <p id="titulo-reponer" class="viz-title flex items-center gap-2 scroll-mt-24"><i data-lucide="bell-ring" class="w-4 h-4 text-brand-yellow"></i> Reponer pronto</p>
                         <p class="viz-sub mb-3">Agotados o con pocas unidades, ordenados por lo que más piden</p>
                         <div id="reposicion" class="divide-y divide-slate-800"></div>
                     </div>
